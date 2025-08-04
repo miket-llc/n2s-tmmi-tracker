@@ -23,6 +23,7 @@ from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
 from components.debug import render_debug_info
+from components.manual_sample import render_manual_sample_data
 from utils.version import format_version_display, get_deployment_info
 from utils.sample_data import initialize_sample_data
 # Configure logging
@@ -148,6 +149,7 @@ def render_sidebar():
             'edit_history': 'Edit History',
             'organizations': 'Manage Organizations',
             'levels': 'Level Analysis',
+            'manual_sample': 'Create Sample Data',
             'about': 'About TMMi'
         }
         selected_page = st.radio(
@@ -245,6 +247,8 @@ def render_main_content():
             render_manage_organizations()
         elif current_page == 'levels':
             render_level_breakdown()
+        elif current_page == 'manual_sample':
+            render_manual_sample_data()
         elif current_page == 'about':
             render_about_page()
     except Exception as e:

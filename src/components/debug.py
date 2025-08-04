@@ -40,12 +40,26 @@ def render_debug_info():
         
         if st.button("Force Initialize Sample Data"):
             try:
-                if initialize_sample_data():
-                    st.success("Sample data created!")
+                # Import the direct creation function
+                import sys
+                import os
+                sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+                
+                from create_sample_data_direct import create_sample_data_now
+                
+                with st.spinner("Creating sample data..."):
+                    success, message = create_sample_data_now()
+                
+                if success:
+                    st.success(f"✅ {message}")
+                    st.info("Refresh the page to see the new data!")
                 else:
-                    st.info("Sample data already exists or creation was skipped")
+                    st.error(f"❌ {message}")
+                    
             except Exception as e:
-                st.error(f"Sample data initialization failed: {e}")
+                st.error(f"Sample data creation failed: {e}")
+                import traceback
+                st.text(traceback.format_exc())
         
         if st.button("Clear Session State"):
             for key in list(st.session_state.keys()):
