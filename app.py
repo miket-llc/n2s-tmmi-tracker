@@ -22,6 +22,7 @@ from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
 from utils.version import format_version_display, get_deployment_info
+from utils.sample_data import initialize_sample_data
 # Configure logging
 os.makedirs('logs', exist_ok=True)
 logging.basicConfig(
@@ -111,6 +112,8 @@ def initialize_session_state():
         st.session_state.page = 'dashboard'
     if 'assessment_answers' not in st.session_state:
         st.session_state.assessment_answers = {}
+    if 'sample_data_initialized' not in st.session_state:
+        st.session_state.sample_data_initialized = False
 
 
 def show_error_message(message, details=None):
@@ -393,6 +396,13 @@ def main():
     try:
         # Initialize session state
         initialize_session_state()
+        
+        # Initialize sample data if needed (only once per session)
+        if not st.session_state.sample_data_initialized:
+            if initialize_sample_data():
+                logging.info("Sample data initialized for demonstration")
+            st.session_state.sample_data_initialized = True
+        
         # Create main layout
         render_sidebar()
         render_main_content()
