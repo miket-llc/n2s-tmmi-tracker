@@ -20,6 +20,7 @@ from components.dashboard import (
 )
 from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
+from utils.version import format_version_display, get_deployment_info
 # Configure logging
 os.makedirs('logs', exist_ok=True)
 logging.basicConfig(
@@ -188,10 +189,29 @@ def render_sidebar():
         }
         for level, description in level_info.items():
             st.caption(f"**{description}**")
+        
+        st.markdown("---")
+        # Version Information
+        st.markdown("### Application Info")
+        st.markdown(format_version_display(compact=False), unsafe_allow_html=True)
+        
+        # Deployment environment
+        deployment = get_deployment_info()
+        if deployment:
+            st.caption(f"Environment: {deployment}")
 
 
 def render_main_content():
     """Render the main content area based on selected page"""
+    # Add version header to main content
+    col1, col2 = st.columns([4, 1])
+    with col2:
+        st.markdown(f"""
+        <div style="text-align: right; color: #6C757D; font-size: 0.85em; margin-bottom: 1rem;">
+            {format_version_display(compact=True)}
+        </div>
+        """, unsafe_allow_html=True)
+    
     try:
         questions = load_tmmi_questions()
         if not questions:
