@@ -341,9 +341,7 @@ def render_question(question: TMMiQuestion):
         label_visibility="collapsed"
     )
 
-    # Show change indicator for answer
-    if original_answer and answer and answer != original_answer:
-        st.markdown(f"**Answer Modified** _(previous: {original_answer})_")
+
 
     # Evidence URL field
     evidence_url = st.text_input(
@@ -353,12 +351,7 @@ def render_question(question: TMMiQuestion):
         help="Link to supporting documentation or evidence"
     )
 
-    # Show change indicator for evidence
-    if original_evidence and evidence_url != original_evidence:
-        if original_evidence:
-            st.markdown(f"**Evidence Modified** _(previous: {original_evidence[:50]}...)_")
-        else:
-            st.markdown("**Evidence Added**")
+
 
     # Comment field
     comment = st.text_area(
@@ -369,12 +362,7 @@ def render_question(question: TMMiQuestion):
         help="Additional notes or context for this answer"
     )
 
-    # Show change indicator for comment
-    if original_comment and comment != original_comment:
-        if original_comment:
-            st.markdown(f"**Comment Modified** _(previous: {original_comment[:50]}...)_")
-        else:
-            st.markdown("**Comment Added**")
+
 
     # Show recommendation if not fully compliant
     if answer in ['Partial', 'No']:
