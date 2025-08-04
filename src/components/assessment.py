@@ -117,10 +117,7 @@ def render_assessment_form(questions: List[TMMiQuestion]
                 help="Person conducting this assessment"
             )
 
-            # Show change indicator for reviewer
-            if (st.session_state.original_assessment
-                    and reviewer_name != st.session_state.original_assessment.reviewer_name):
-                st.markdown(f"**Modified** _(previous: {st.session_state.original_assessment.reviewer_name})_")
+
 
         with col2:
             organization = st.text_input(
@@ -129,10 +126,7 @@ def render_assessment_form(questions: List[TMMiQuestion]
                 help="Organization being assessed"
             )
 
-            # Show change indicator for organization
-            if (st.session_state.original_assessment
-                    and organization != st.session_state.original_assessment.organization):
-                st.markdown(f"**Modified** _(previous: {st.session_state.original_assessment.organization})_")
+
 
     if not reviewer_name or not organization:
         st.warning("Please fill in the reviewer name and organization before proceeding.")
