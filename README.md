@@ -1,4 +1,4 @@
-# TMMi Assessment Tracker
+# N2S TMMi Tracker
 
 A Streamlit application for evaluating and tracking progress toward TMMi (Test Maturity Model Integration) certification.
 

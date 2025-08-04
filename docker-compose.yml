@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  n2s-tmmi-tracker:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      # Production database path - points to persistent volume
+      - TMMI_DB_PATH=/app/persistent_data/assessments.db
+      # Backup directory - also on persistent volume
+      - TMMI_BACKUP_DIR=/app/persistent_data/backups
+      # Questions file path
+      - TMMI_QUESTIONS_PATH=/app/persistent_data/tmmi_questions.json
+    volumes:
+      # Mount persistent data directory
+      - tmmi_data:/app/persistent_data
+      # Mount logs directory (optional)
+      - tmmi_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  # Named volume for persistent data
+  tmmi_data:
+    driver: local
+  tmmi_logs:
+    driver: local

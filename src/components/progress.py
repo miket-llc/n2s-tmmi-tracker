@@ -1,5 +1,5 @@
 """
-Organization Progress visualization component for TMMi Assessment Tracker
+Organization Progress visualization component for N2S TMMi Tracker
 """
 import streamlit as st
 import pandas as pd

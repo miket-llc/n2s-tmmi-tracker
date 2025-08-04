@@ -1,5 +1,5 @@
 """
-Debug component for troubleshooting TMMi Assessment Tracker
+Debug component for troubleshooting N2S TMMi Tracker
 """
 import streamlit as st
 import logging

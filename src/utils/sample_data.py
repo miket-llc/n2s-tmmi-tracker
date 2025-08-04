@@ -1,5 +1,5 @@
 """
-Sample data initialization for TMMi Assessment Tracker
+Sample data initialization for N2S TMMi Tracker
 Automatically creates sample data when no organizations exist
 """
 from datetime import datetime, timedelta

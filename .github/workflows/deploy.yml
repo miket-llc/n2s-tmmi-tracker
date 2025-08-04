@@ -1,0 +1,179 @@
+name: Deploy N2S TMMi Tracker
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      create_backup:
+        description: 'Create backup before deployment'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run basic tests
+      run: |
+        # Test database initialization
+        python -c "from src.models.database import TMMiDatabase; db = TMMiDatabase('test.db'); print('Database test passed')"
+        
+        # Test questions loading
+        python -c "from src.models.database import load_tmmi_questions; questions = load_tmmi_questions(); print(f'Loaded {len(questions)} questions')"
+        
+        # Clean up test files
+        rm -f test.db
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create pre-deployment backup
+      if: ${{ github.event.inputs.create_backup == 'true' || github.event.inputs.create_backup == '' }}
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_SERVER_HOST }}
+        username: ${{ secrets.PRODUCTION_SERVER_USER }}
+        key: ${{ secrets.PRODUCTION_SERVER_KEY }}
+        script: |
+          cd ${{ secrets.APP_DIRECTORY || '/app/tmmi-tracker' }}
+          
+          # Set environment variables
+          export TMMI_DB_PATH="${{ secrets.TMMI_DB_PATH || '/var/lib/tmmi/assessments.db' }}"
+          export TMMI_BACKUP_DIR="${{ secrets.TMMI_BACKUP_DIR || '/var/lib/tmmi/backups' }}"
+          
+          # Create backup directory if it doesn't exist
+          mkdir -p "$TMMI_BACKUP_DIR"
+          
+          # Create pre-deployment backup if database exists
+          if [ -f "$TMMI_DB_PATH" ]; then
+            echo "Creating pre-deployment backup..."
+            BACKUP_FILE="$TMMI_BACKUP_DIR/pre_deploy_$(date +%Y%m%d_%H%M%S).db"
+            cp "$TMMI_DB_PATH" "$BACKUP_FILE"
+            echo "Backup created: $BACKUP_FILE"
+          else
+            echo "No existing database found, skipping backup"
+          fi
+    
+    - name: Deploy application
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_SERVER_HOST }}
+        username: ${{ secrets.PRODUCTION_SERVER_USER }}
+        key: ${{ secrets.PRODUCTION_SERVER_KEY }}
+        script: |
+          cd ${{ secrets.APP_DIRECTORY || '/app/tmmi-tracker' }}
+          
+          echo "Pulling latest code..."
+          git pull origin main
+          
+          # Set environment variables for production
+          export TMMI_DB_PATH="${{ secrets.TMMI_DB_PATH || '/var/lib/tmmi/assessments.db' }}"
+          export TMMI_BACKUP_DIR="${{ secrets.TMMI_BACKUP_DIR || '/var/lib/tmmi/backups' }}"
+          export TMMI_QUESTIONS_PATH="${{ secrets.TMMI_QUESTIONS_PATH || '/var/lib/tmmi/tmmi_questions.json' }}"
+          
+          echo "Environment variables set:"
+          echo "TMMI_DB_PATH: $TMMI_DB_PATH"
+          echo "TMMI_BACKUP_DIR: $TMMI_BACKUP_DIR"
+          echo "TMMI_QUESTIONS_PATH: $TMMI_QUESTIONS_PATH"
+          
+          # Create necessary directories
+          mkdir -p "$(dirname "$TMMI_DB_PATH")"
+          mkdir -p "$TMMI_BACKUP_DIR"
+          mkdir -p "$(dirname "$TMMI_QUESTIONS_PATH")"
+          
+          # Copy questions file to persistent location if needed
+          if [ ! -f "$TMMI_QUESTIONS_PATH" ] && [ -f "data/tmmi_questions.json" ]; then
+            echo "Copying questions file to persistent location..."
+            cp "data/tmmi_questions.json" "$TMMI_QUESTIONS_PATH"
+          fi
+          
+          # Stop existing application
+          echo "Stopping existing application..."
+          pkill -f "streamlit run app.py" || echo "No existing application found"
+          
+          # Wait for cleanup
+          sleep 5
+          
+          # Start application in background
+          echo "Starting application..."
+          nohup ./run_app.sh > deploy.log 2>&1 &
+          
+          # Wait for application to start
+          echo "Waiting for application to start..."
+          sleep 15
+    
+    - name: Health check
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_SERVER_HOST }}
+        username: ${{ secrets.PRODUCTION_SERVER_USER }}
+        key: ${{ secrets.PRODUCTION_SERVER_KEY }}
+        script: |
+          # Wait a bit more for full startup
+          sleep 10
+          
+          # Health check with retries
+          for i in {1..5}; do
+            echo "Health check attempt $i..."
+            if curl -f http://localhost:8501/_stcore/health; then
+              echo "Health check passed!"
+              exit 0
+            fi
+            echo "Health check failed, retrying in 10 seconds..."
+            sleep 10
+          done
+          
+          echo "Health check failed after 5 attempts"
+          echo "Application logs:"
+          tail -n 50 deploy.log || echo "No deploy log found"
+          exit 1
+    
+    - name: Cleanup old backups
+      if: success()
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_SERVER_HOST }}
+        username: ${{ secrets.PRODUCTION_SERVER_USER }}
+        key: ${{ secrets.PRODUCTION_SERVER_KEY }}
+        script: |
+          export TMMI_BACKUP_DIR="${{ secrets.TMMI_BACKUP_DIR || '/var/lib/tmmi/backups' }}"
+          
+          if [ -d "$TMMI_BACKUP_DIR" ]; then
+            echo "Cleaning up old backups (keeping 20 most recent)..."
+            cd "$TMMI_BACKUP_DIR"
+            ls -t *.db 2>/dev/null | tail -n +21 | xargs -r rm -f
+            echo "Backup cleanup completed"
+            echo "Remaining backups:"
+            ls -la *.db 2>/dev/null || echo "No backup files found"
+          fi
+    
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment successful!"
+        else
+          echo "❌ Deployment failed!"
+        fi

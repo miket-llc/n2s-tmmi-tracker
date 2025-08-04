@@ -1,5 +1,5 @@
 """
-Version information utilities for TMMi Assessment Tracker
+Version information utilities for N2S TMMi Tracker
 """
 import os
 import subprocess
@@ -52,7 +52,7 @@ def get_version_info() -> Dict[str, str]:
         'git_commit': git_commit,
         'git_branch': git_branch,
         'build_date': build_date,
-        'app_name': 'TMMi Assessment Tracker'
+        'app_name': 'N2S TMMi Tracker'
     }
 
 

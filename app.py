@@ -1,5 +1,5 @@
 """
-TMMi Assessment Tracker - Professional Assessment Platform
+N2S TMMi Tracker - Professional Assessment Platform
 Updated: 2025-01-04
 """
 import streamlit as st
@@ -24,6 +24,7 @@ from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
 from components.debug import render_debug_info
 from components.manual_sample import render_manual_sample_data
+from components.database_admin import render_database_admin
 from utils.version import format_version_display, get_deployment_info
 from utils.sample_data import initialize_sample_data
 # Configure logging
@@ -38,7 +39,7 @@ logging.basicConfig(
 )
 # Page configuration - professional, no emojis
 st.set_page_config(
-    page_title="TMMi Assessment Tracker",
+    page_title="N2S TMMi Tracker",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -135,7 +136,7 @@ def render_sidebar():
     with st.sidebar:
         st.markdown("""
         <div class="main-header">
-            <h1>TMMi Assessment Tracker</h1>
+            <h1>N2S TMMi Tracker</h1>
             <p>Professional Test Maturity Assessment Platform</p>
         </div>
         """, unsafe_allow_html=True)
@@ -150,6 +151,7 @@ def render_sidebar():
             'organizations': 'Manage Organizations',
             'levels': 'Level Analysis',
             'manual_sample': 'Create Sample Data',
+            'database_admin': 'Database Admin',
             'about': 'About TMMi'
         }
         selected_page = st.radio(
@@ -249,6 +251,8 @@ def render_main_content():
             render_level_breakdown()
         elif current_page == 'manual_sample':
             render_manual_sample_data()
+        elif current_page == 'database_admin':
+            render_database_admin()
         elif current_page == 'about':
             render_about_page()
     except Exception as e:
@@ -426,7 +430,7 @@ def main():
         st.markdown("---")
         st.markdown("""
         <div style="text-align: center; color: #7F8C8D; padding: 1rem; font-size: 0.9rem;">
-            TMMi Assessment Tracker | Professional Test Maturity Assessment Platform<br>
+            N2S TMMi Tracker | Professional Test Maturity Assessment Platform<br>
             <small>For more information about TMMi, visit
             <a href="https://www.tmmi.org/" target="_blank" style="color: #2E5984;">tmmi.org</a></small>
         </div>

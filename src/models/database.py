@@ -1,5 +1,5 @@
 """
-Database models and schema for TMMi Assessment Tracker
+Database models and schema for N2S TMMi Tracker
 """
 import sqlite3
 import json
@@ -49,14 +49,19 @@ class Assessment:
 class TMMiDatabase:
     """Database manager for TMMi assessments"""
 
-    def __init__(self, db_path: str = "data/assessments.db"):
+    def __init__(self, db_path: str = None):
+        if db_path is None:
+            # Use environment variable for production deployments
+            db_path = os.environ.get('TMMI_DB_PATH', 'data/assessments.db')
         self.db_path = db_path
         self.ensure_db_directory()
         self.init_database()
 
     def ensure_db_directory(self):
         """Ensure the data directory exists"""
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir:  # Only create directory if path has a directory component
+            os.makedirs(db_dir, exist_ok=True)
 
     def init_database(self):
         """Initialize database tables"""
@@ -568,10 +573,115 @@ class TMMiDatabase:
                 'answers': answers
             }
 
+    def backup_database(self, backup_path: str = None) -> str:
+        """Create a backup of the database"""
+        import shutil
+        from datetime import datetime
+        
+        if backup_path is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_dir = os.environ.get('TMMI_BACKUP_DIR', 'backups')
+            os.makedirs(backup_dir, exist_ok=True)
+            backup_path = os.path.join(backup_dir, f"tmmi_backup_{timestamp}.db")
+        
+        try:
+            shutil.copy2(self.db_path, backup_path)
+            return backup_path
+        except Exception as e:
+            raise Exception(f"Database backup failed: {str(e)}")
 
-def load_tmmi_questions(file_path: str = "data/tmmi_questions.json"
+    def restore_database(self, backup_path: str) -> bool:
+        """Restore database from backup"""
+        import shutil
+        
+        try:
+            if not os.path.exists(backup_path):
+                raise FileNotFoundError(f"Backup file not found: {backup_path}")
+            
+            # Create a backup of current database before restoring
+            current_backup = self.backup_database()
+            print(f"Current database backed up to: {current_backup}")
+            
+            # Restore from backup
+            shutil.copy2(backup_path, self.db_path)
+            
+            # Verify the restored database
+            self.verify_database_integrity()
+            return True
+            
+        except Exception as e:
+            print(f"Database restore failed: {str(e)}")
+            return False
+
+    def verify_database_integrity(self) -> bool:
+        """Verify database integrity and schema"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Check if core tables exist
+                cursor.execute("""
+                    SELECT name FROM sqlite_master 
+                    WHERE type='table' AND name IN ('assessments', 'assessment_answers', 'organizations')
+                """)
+                tables = [row[0] for row in cursor.fetchall()]
+                
+                required_tables = ['assessments', 'assessment_answers', 'organizations']
+                missing_tables = set(required_tables) - set(tables)
+                
+                if missing_tables:
+                    print(f"Missing required tables: {missing_tables}")
+                    return False
+                
+                # Test basic operations
+                cursor.execute("SELECT COUNT(*) FROM assessments")
+                cursor.execute("SELECT COUNT(*) FROM organizations")
+                
+                return True
+                
+        except Exception as e:
+            print(f"Database integrity check failed: {str(e)}")
+            return False
+
+    def get_database_stats(self) -> Dict:
+        """Get database statistics for monitoring"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                stats = {}
+                
+                # Get table counts
+                cursor.execute("SELECT COUNT(*) FROM assessments")
+                stats['total_assessments'] = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM assessment_answers")
+                stats['total_answers'] = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM organizations")
+                stats['total_organizations'] = cursor.fetchone()[0]
+                
+                # Get database file size
+                stats['db_size_bytes'] = os.path.getsize(self.db_path)
+                stats['db_size_mb'] = round(stats['db_size_bytes'] / (1024 * 1024), 2)
+                
+                # Get last assessment date
+                cursor.execute("SELECT MAX(timestamp) FROM assessments")
+                last_assessment = cursor.fetchone()[0]
+                stats['last_assessment'] = last_assessment
+                
+                return stats
+                
+        except Exception as e:
+            return {'error': str(e)}
+
+
+def load_tmmi_questions(file_path: str = None
                         ) -> List[TMMiQuestion]:
     """Load TMMi questions from JSON file"""
+    if file_path is None:
+        file_path = os.environ.get('TMMI_QUESTIONS_PATH', 'data/tmmi_questions.json')
+    
     try:
         with open(file_path, 'r') as f:
             questions_data = json.load(f)

@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tmmi-assessment-tracker"
+name = "n2s-tmmi-tracker"
 version = "1.0.0"
 description = "Professional Test Maturity Model Integration (TMMi) Assessment Platform"
 authors = [{name = "TMMi Assessment Team"}]
