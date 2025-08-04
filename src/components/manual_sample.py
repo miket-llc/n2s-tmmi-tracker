@@ -129,7 +129,7 @@ def create_complete_sample_data():
             progression = i / (len(scenarios) - 1)  # 0.0 to 1.0
             
             for question in questions:
-                q_level = question['level']
+                q_level = question.level
                 target = scenario['target_level']
                 
                 if q_level < target:
@@ -156,9 +156,9 @@ def create_complete_sample_data():
                         answer = 'No'
                 
                 answers.append(AssessmentAnswer(
-                    question_id=question['id'],
+                    question_id=question.id,
                     answer=answer,
-                    evidence_url=(f"https://docs.sampletest.org/{question['id'].lower()}" 
+                    evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}" 
                                  if answer == 'Yes' and i > 3 else None),
                     comment=(f"Implementation in progress - Assessment {i+1}" 
                             if answer == 'Partial' else None)

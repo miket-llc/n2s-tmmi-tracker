@@ -74,7 +74,7 @@ def create_sample_data_now():
             answers = []
             for j, question in enumerate(questions):
                 # Simple progression logic
-                if question['level'] <= scenario['level']:
+                if question.level <= scenario['level']:
                     if i >= 5:  # Later assessments
                         answer = 'Yes'
                     elif i >= 3:
@@ -82,12 +82,12 @@ def create_sample_data_now():
                     else:
                         answer = 'Partial' if j % 3 == 0 else 'No'
                 else:
-                    answer = 'Partial' if question['level'] == scenario['level'] + 1 and i >= 6 else 'No'
+                    answer = 'Partial' if question.level == scenario['level'] + 1 and i >= 6 else 'No'
                 
                 answers.append(AssessmentAnswer(
-                    question_id=question['id'],
+                    question_id=question.id,
                     answer=answer,
-                    evidence_url=f"https://docs.sampletest.org/{question['id'].lower()}" if answer == 'Yes' and i > 3 else None,
+                    evidence_url=f"https://docs.sampletest.org/{question.id.lower()}" if answer == 'Yes' and i > 3 else None,
                     comment=f"Assessment {i+1} response" if answer == 'Partial' else None
                 ))
             
