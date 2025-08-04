@@ -38,7 +38,7 @@ def render_assessment_form(questions: List[TMMiQuestion]
             col1, col2 = st.columns([2, 1])
             with col1:
                 selected_org_name = st.selectbox(
-                    "Choose Organization",
+                    "Choose Organization *",
                     options=org_options,
                     help=("Select an existing organization to pre-fill "
                           "form with their latest assessment data")
@@ -117,19 +117,17 @@ def render_assessment_form(questions: List[TMMiQuestion]
                 help="Person conducting this assessment"
             )
 
-
-
-        with col2:
-            organization = st.text_input(
-                "Organization *",
-                value=st.session_state.prefilled_data.get('organization', ''),
-                help="Organization being assessed"
-            )
-
-
+        # Organization is now selected from dropdown above, no need for text input
+        # Use the selected organization name
+        organization = (
+            st.session_state.selected_organization 
+            if (st.session_state.selected_organization 
+                and st.session_state.selected_organization != "Select an organization...")
+            else None
+        )
 
     if not reviewer_name or not organization:
-        st.warning("Please fill in the reviewer name and organization before proceeding.")
+        st.warning("Please fill in the reviewer name and select an organization before proceeding.")
         return None
 
     # Group questions by level and process area
@@ -298,36 +296,28 @@ def render_question(question: TMMiQuestion):
     # Question container
     question_key = f"q_{question.id}"
 
-    st.markdown(f"**Q{question.id.split('_')[-1]}:** {question.question}")
-
-    # Show importance and level
-    importance_color = {
-        'High': 'High Priority',
-        'Medium': 'Medium Priority',
-        'Low': 'Low Priority'
-    }
-
+    # Show importance level - properly formatted and aligned
     col1, col2 = st.columns([3, 1])
 
-    with col2:
+    with col1:
+        # Display question with priority badge inline
         priority_class = f"status-{question.importance.lower()}"
-        st.markdown(
-            f'<span class="{priority_class}">'
-            f'{importance_color.get(question.importance, question.importance)} Priority</span>',
-            unsafe_allow_html=True)
+        question_html = (
+            f'<div style="display: flex; align-items: center; gap: 8px;">'
+            f'<span><strong>Q{question.id.split("_")[-1]}:</strong> {question.question}</span>'
+            f'<span class="{priority_class}" style="font-size: 0.8em; padding: 2px 6px; '
+            f'border-radius: 4px; background-color: var(--background-color);">'
+            f'Priority: {question.importance}</span>'
+            f'</div>'
+        )
+        st.markdown(question_html, unsafe_allow_html=True)
+    
+    with col2:
+        # Show level info
+        st.caption(f"Level {question.level}")
 
-    # Get original answer for comparison
-    original_answer = None
-    original_evidence = ''
-    original_comment = ''
-
-    if st.session_state.original_assessment:
-        for ans in st.session_state.original_assessment.answers:
-            if ans.question_id == question.id:
-                original_answer = ans.answer
-                original_evidence = ans.evidence_url or ''
-                original_comment = ans.comment or ''
-                break
+    # Get original answer for comparison (if needed for change tracking)
+    # Note: Original answer tracking is available in session state if needed
 
     # Answer selection
     current_answer = st.session_state.assessment_answers.get(question.id, {}).get('answer', None)
@@ -341,8 +331,6 @@ def render_question(question: TMMiQuestion):
         label_visibility="collapsed"
     )
 
-
-
     # Evidence URL field
     evidence_url = st.text_input(
         "Evidence/Reference URL (optional)",
@@ -350,8 +338,6 @@ def render_question(question: TMMiQuestion):
         key=f"{question_key}_evidence",
         help="Link to supporting documentation or evidence"
     )
-
-
 
     # Comment field
     comment = st.text_area(
@@ -361,8 +347,6 @@ def render_question(question: TMMiQuestion):
         height=80,
         help="Additional notes or context for this answer"
     )
-
-
 
     # Show recommendation if not fully compliant
     if answer in ['Partial', 'No']:
