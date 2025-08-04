@@ -136,18 +136,33 @@ def render_header_metrics(summary: Dict):
         )
 
 
-def render_maturity_trend(assessments: List, questions: List[TMMiQuestion]):
+def render_maturity_trend(assessments: List, questions: List[TMMiQuestion], selected_org_id: int = None):
     """Render maturity progression over time"""
     
     st.markdown("### Maturity Progression Over Time")
     
-    if len(assessments) < 2:
+    # Filter assessments for selected organization if specified
+    if selected_org_id:
+        db = TMMiDatabase()
+        org_assessments = db.get_assessments_by_org(selected_org_id)
+        
+        if len(org_assessments) < 2:
+            st.info("Complete multiple assessments for this organization to see progression trends.")
+            return
+        
+        # Get full assessment objects for the organization
+        org_assessment_ids = [a['assessment_id'] for a in org_assessments]
+        filtered_assessments = [a for a in assessments if a.id in org_assessment_ids]
+    else:
+        filtered_assessments = assessments
+        
+    if len(filtered_assessments) < 2:
         st.info("Complete multiple assessments to see progression trends.")
         return
     
     # Prepare trend data
     trend_data = []
-    for assessment in reversed(assessments):  # Chronological order
+    for assessment in reversed(filtered_assessments):  # Chronological order
         summary = generate_assessment_summary(questions, assessment)
         
         trend_data.append({
