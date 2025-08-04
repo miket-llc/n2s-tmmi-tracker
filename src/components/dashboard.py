@@ -17,18 +17,66 @@ def render_dashboard(questions: List[TMMiQuestion]):
     st.header("TMMi Assessment Dashboard")
     
     db = TMMiDatabase()
-    assessments = db.get_assessments()
     
-    if not assessments:
-        st.info("No assessment data available. Complete your first assessment to see dashboard insights.")
+    # Get all organizations for selection
+    organizations = db.get_organizations()
+    
+    if not organizations:
+        st.info("No organizations found. Please add an organization first.")
+        if st.button("Manage Organizations"):
+            st.session_state.page = 'organizations'
+            st.rerun()
+        return
+    
+    # Organization selector
+    org_options = {
+        org['id']: f"{org['name']} ({org['status']})"
+        for org in organizations
+    }
+    
+    selected_org_id = st.selectbox(
+        "Select Organization",
+        options=list(org_options.keys()),
+        format_func=lambda x: org_options[x],
+        help="Choose an organization to view dashboard data"
+    )
+    
+    if not selected_org_id:
+        return
+    
+    # Get assessments for selected organization
+    org_assessments = db.get_assessments_by_org(selected_org_id)
+    
+    if not org_assessments:
+        selected_org_name = org_options[selected_org_id]
+        st.info(f"No assessment data available for {selected_org_name}. Complete an assessment first.")
         if st.button("Start Assessment"):
             st.session_state.page = 'assessment'
             st.rerun()
         return
     
-    # Get latest assessment for current status
-    latest_assessment = assessments[0]
+    # Get latest assessment for selected organization
+    # Convert org assessment data to Assessment object for compatibility
+    latest_org_assessment = org_assessments[-1]  # Most recent
+    
+    # Get the full Assessment object
+    all_assessments = db.get_assessments()
+    latest_assessment = None
+    for assessment in all_assessments:
+        if assessment.id == latest_org_assessment['assessment_id']:
+            latest_assessment = assessment
+            break
+    
+    if not latest_assessment:
+        st.error("Could not load assessment details.")
+        return
+    
     summary = generate_assessment_summary(questions, latest_assessment)
+    
+    # Show organization info
+    selected_org = next(org for org in organizations if org['id'] == selected_org_id)
+    st.markdown(f"**Organization:** {selected_org['name']} | **Assessments:** {len(org_assessments)}")
+    st.markdown("---")
     
     # Dashboard header metrics
     render_header_metrics(summary)
@@ -37,7 +85,7 @@ def render_dashboard(questions: List[TMMiQuestion]):
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        render_maturity_trend(assessments, questions)
+        render_maturity_trend(all_assessments, questions, selected_org_id)
         render_process_area_compliance(summary)
     
     with col2:
