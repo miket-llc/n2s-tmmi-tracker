@@ -462,6 +462,112 @@ class TMMiDatabase:
 
             return enhanced_orgs
 
+    def get_assessments_by_org(self, org_id: int) -> List[dict]:
+        """Get all assessments for a specific organization"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+
+            # First get the organization name
+            cursor.execute("SELECT name FROM organizations WHERE id = ?", (org_id,))
+            org_result = cursor.fetchone()
+            if not org_result:
+                return []
+            
+            org_name = org_result[0]
+
+            # Get all assessments for this organization
+            cursor.execute("""
+                SELECT 
+                    a.id,
+                    a.timestamp,
+                    a.reviewer_name,
+                    a.organization,
+                    COUNT(aa.id) as total_answers,
+                    COUNT(CASE WHEN aa.answer = 'Yes' THEN 1 END) as yes_count,
+                    COUNT(CASE WHEN aa.answer = 'Partial' THEN 1 END) as partial_count,
+                    COUNT(CASE WHEN aa.answer = 'No' THEN 1 END) as no_count
+                FROM assessments a
+                LEFT JOIN assessment_answers aa ON a.id = aa.assessment_id
+                WHERE LOWER(a.organization) = LOWER(?)
+                GROUP BY a.id
+                ORDER BY a.timestamp ASC
+            """, (org_name,))
+
+            assessments = []
+            for row in cursor.fetchall():
+                assessment_id, timestamp, reviewer, org, total, yes, partial, no = row
+                
+                # Calculate compliance percentage and maturity level
+                compliance_pct = (yes / total * 100) if total > 0 else 0
+                
+                # Determine maturity level based on compliance (simplified logic)
+                if compliance_pct >= 90:
+                    maturity_level = 5
+                elif compliance_pct >= 80:
+                    maturity_level = 4
+                elif compliance_pct >= 60:
+                    maturity_level = 3
+                elif compliance_pct >= 40:
+                    maturity_level = 2
+                else:
+                    maturity_level = 1
+
+                assessments.append({
+                    'assessment_id': assessment_id,
+                    'timestamp': timestamp,
+                    'reviewer_name': reviewer,
+                    'organization': org,
+                    'total_answers': total,
+                    'yes_count': yes or 0,
+                    'partial_count': partial or 0,
+                    'no_count': no or 0,
+                    'compliance_percentage': compliance_pct,
+                    'maturity_level': maturity_level
+                })
+
+            return assessments
+
+    def get_tmmi_scores_by_assessment(self, assessment_id: int) -> dict:
+        """Get detailed TMMi scores and process area breakdown for an assessment"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+
+            # Get assessment details
+            cursor.execute("""
+                SELECT timestamp, reviewer_name, organization
+                FROM assessments WHERE id = ?
+            """, (assessment_id,))
+            
+            assessment_row = cursor.fetchone()
+            if not assessment_row:
+                return {}
+
+            timestamp, reviewer, organization = assessment_row
+
+            # Get all answers for this assessment
+            cursor.execute("""
+                SELECT question_id, answer, evidence_url, comment
+                FROM assessment_answers
+                WHERE assessment_id = ?
+            """, (assessment_id,))
+
+            answers = {}
+            for row in cursor.fetchall():
+                question_id, answer, evidence_url, comment = row
+                answers[question_id] = {
+                    'answer': answer,
+                    'evidence_url': evidence_url,
+                    'comment': comment
+                }
+
+            return {
+                'assessment_id': assessment_id,
+                'timestamp': timestamp,
+                'reviewer_name': reviewer,
+                'organization': organization,
+                'answers': answers
+            }
+
 
 def load_tmmi_questions(file_path: str = "data/tmmi_questions.json"
                         ) -> List[TMMiQuestion]:

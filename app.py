@@ -20,6 +20,7 @@ from components.dashboard import (
 )
 from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
+from components.progress import render_organization_progress
 from utils.version import format_version_display, get_deployment_info
 # Configure logging
 os.makedirs('logs', exist_ok=True)
@@ -138,6 +139,7 @@ def render_sidebar():
             'dashboard': 'Dashboard Overview',
             'assessment': 'New Assessment',
             'history': 'Assessment History',
+            'progress': 'Organization Progress',
             'edit_history': 'Edit History',
             'organizations': 'Manage Organizations',
             'levels': 'Level Analysis',
@@ -227,6 +229,8 @@ def render_main_content():
             render_assessment_page(questions)
         elif current_page == 'history':
             render_assessment_history()
+        elif current_page == 'progress':
+            render_organization_progress()
         elif current_page == 'edit_history':
             render_edit_history()
         elif current_page == 'organizations':
