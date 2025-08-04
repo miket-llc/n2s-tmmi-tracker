@@ -21,6 +21,7 @@ from components.dashboard import (
 from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
+from components.debug import render_debug_info
 from utils.version import format_version_display, get_deployment_info
 from utils.sample_data import initialize_sample_data
 # Configure logging
@@ -204,6 +205,9 @@ def render_sidebar():
         deployment = get_deployment_info()
         if deployment:
             st.caption(f"Environment: {deployment}")
+        
+        # Debug info (only in development or when needed)
+        render_debug_info()
 
 
 def render_main_content():
@@ -399,8 +403,15 @@ def main():
         
         # Initialize sample data if needed (only once per session)
         if not st.session_state.sample_data_initialized:
-            if initialize_sample_data():
-                logging.info("Sample data initialized for demonstration")
+            try:
+                if initialize_sample_data():
+                    st.success("✅ Sample data initialized! Check the Organization Progress page.", icon="🎉")
+                    logging.info("Sample data initialized for demonstration")
+                else:
+                    logging.info("Sample data already exists or initialization skipped")
+            except Exception as e:
+                st.error(f"⚠️ Sample data initialization failed: {str(e)}")
+                logging.error(f"Sample data initialization error: {e}")
             st.session_state.sample_data_initialized = True
         
         # Create main layout

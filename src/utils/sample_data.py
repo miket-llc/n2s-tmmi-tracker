@@ -137,6 +137,7 @@ def initialize_sample_data() -> bool:
         existing_orgs = db.get_organizations()
         if existing_orgs:
             # Sample data already exists or real data is present
+            logging.info(f"Found {len(existing_orgs)} existing organizations, skipping sample data")
             return False
         
         # Load TMMi questions
@@ -145,18 +146,34 @@ def initialize_sample_data() -> bool:
             logging.warning("No TMMi questions available, skipping sample data creation")
             return False
         
+        logging.info(f"Loaded {len(questions)} TMMi questions for sample data")
+        
         # Create sample organization
         org_id = create_sample_organization(db)
+        logging.info(f"Created sample organization with ID: {org_id}")
         
         # Create sample assessments
         assessment_ids = create_sample_assessments(db, org_id, questions)
+        logging.info(f"Created {len(assessment_ids)} sample assessments")
         
-        logging.info(f"Sample data initialized successfully: "
-                    f"1 organization, {len(assessment_ids)} assessments")
-        return True
+        # Verify the data was created
+        verification_orgs = db.get_organizations()
+        verification_assessments = db.get_assessments()
+        
+        logging.info(f"Verification - Organizations: {len(verification_orgs)}, Assessments: {len(verification_assessments)}")
+        
+        if verification_orgs and verification_assessments:
+            logging.info(f"Sample data initialized successfully: "
+                        f"{len(verification_orgs)} organization(s), {len(verification_assessments)} assessments")
+            return True
+        else:
+            logging.error("Sample data verification failed - no data found after creation")
+            return False
         
     except Exception as e:
+        import traceback
         logging.error(f"Failed to initialize sample data: {e}")
+        logging.error(f"Traceback: {traceback.format_exc()}")
         return False
 
 
