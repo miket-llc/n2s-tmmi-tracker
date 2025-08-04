@@ -1,0 +1,18 @@
+[flake8]
+# Set line length to 120 characters as requested
+max-line-length = 120
+
+# Ignore import-related warnings that don't apply to our project structure
+ignore = E402,F401,W293,W291,W503,F811
+
+# Allow longer lines for comments and strings
+max-doc-length = 120
+
+# Set complexity threshold (increased to accommodate UI rendering functions)
+max-complexity = 30
+
+# Exclude directories we don't want to lint
+exclude = .git,__pycache__,venv,.venv,build,dist,*.egg-info,logs,data
+
+# Target Python version
+select = E,W,F,C
