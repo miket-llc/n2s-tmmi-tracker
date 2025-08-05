@@ -1,56 +1,45 @@
 """
 Streamlit components for TMMi assessment interface
 """
+
 import streamlit as st
 from typing import List, Dict, Optional
-from src.models.database import (TMMiQuestion, AssessmentAnswer,
-                                 Assessment, TMMiDatabase)
+from src.models.database import TMMiQuestion, AssessmentAnswer, Assessment, TMMiDatabase
 from src.utils.scoring import generate_assessment_summary
 
 
-def render_assessment_form(questions: List[TMMiQuestion]
-                           ) -> Optional[Assessment]:
+def render_assessment_form(questions: List[TMMiQuestion]) -> Optional[Assessment]:
     """Render the main assessment form with organization selection and
     pre-population"""
-
     st.header("TMMi Assessment")
-    st.markdown("Complete the assessment by answering questions across all "
-                "TMMi levels and process areas.")
-
+    st.markdown("Complete the assessment by answering questions across all " "TMMi levels and process areas.")
     # Initialize session state for pre-filled data
-    if 'prefilled_data' not in st.session_state:
+    if "prefilled_data" not in st.session_state:
         st.session_state.prefilled_data = {}
-    if 'selected_organization' not in st.session_state:
+    if "selected_organization" not in st.session_state:
         st.session_state.selected_organization = None
-    if 'original_assessment' not in st.session_state:
+    if "original_assessment" not in st.session_state:
         st.session_state.original_assessment = None
-
     # Organization selection
     db = TMMiDatabase()
-
     with st.expander("Organization Selection", expanded=True):
         # Get organizations for selection
         organizations = db.get_organizations_for_assessment()
-
         if organizations:
-            org_options = ["Select an organization..."] + [org['name'] for org in organizations]
-
+            org_options = ["Select an organization..."] + [org["name"] for org in organizations]
             col1, col2 = st.columns([2, 1])
             with col1:
                 selected_org_name = st.selectbox(
                     "Choose Organization *",
                     options=org_options,
-                    help=("Select an existing organization to pre-fill "
-                          "form with their latest assessment data")
+                    help=("Select an existing organization to pre-fill " "form with their latest assessment data"),
                 )
-
             with col2:
                 if selected_org_name and selected_org_name != "Select an organization...":
-                    org_data = next((org for org in organizations if org['name'] == selected_org_name), None)
+                    org_data = next((org for org in organizations if org["name"] == selected_org_name), None)
                     if org_data:
                         st.info(f"**{org_data['assessment_count']}** previous assessments")
                         st.caption(f"Latest: {org_data['latest_assessment']}")
-
             # Handle organization selection change
             if selected_org_name != st.session_state.selected_organization:
                 st.session_state.selected_organization = selected_org_name
@@ -58,30 +47,27 @@ def render_assessment_form(questions: List[TMMiQuestion]
                     # Load latest assessment for pre-population
                     latest_assessment = db.get_latest_assessment_by_organization(selected_org_name)
                     st.session_state.original_assessment = latest_assessment
-
                     if latest_assessment:
                         # Pre-populate form data
                         st.session_state.prefilled_data = {
-                            'reviewer_name': latest_assessment.reviewer_name,
-                            'organization': latest_assessment.organization
+                            "reviewer_name": latest_assessment.reviewer_name,
+                            "organization": latest_assessment.organization,
                         }
-
                         # Pre-populate answers
                         prefilled_answers = {}
                         for answer in latest_assessment.answers:
                             prefilled_answers[answer.question_id] = {
-                                'answer': answer.answer,
-                                'evidence_url': answer.evidence_url or '',
-                                'comment': answer.comment or ''
+                                "answer": answer.answer,
+                                "evidence_url": answer.evidence_url or "",
+                                "comment": answer.comment or "",
                             }
                         st.session_state.assessment_answers = prefilled_answers.copy()
-
                         st.success(
                             f"Form pre-filled with data from {selected_org_name}'s most recent "
                             f"assessment from {latest_assessment.timestamp.split('T')[0]}"
                         )
                     else:
-                        st.session_state.prefilled_data = {'organization': selected_org_name}
+                        st.session_state.prefilled_data = {"organization": selected_org_name}
                         st.session_state.assessment_answers = {}
                         st.info(f"No previous assessments found for {selected_org_name}. Starting with a blank form.")
                 else:
@@ -94,11 +80,9 @@ def render_assessment_form(questions: List[TMMiQuestion]
                 "No organizations available. Please add organizations first using the "
                 "'Manage Organizations' section."
             )
-
     # Assessment metadata
     with st.expander("Assessment Information", expanded=True):
         col1, col2 = st.columns(2)
-
         # Show pre-population status if applicable
         if st.session_state.original_assessment:
             st.markdown(
@@ -106,30 +90,27 @@ def render_assessment_form(questions: List[TMMiQuestion]
                 f"most recent assessment.**"
             )
             st.caption(
-                f"Previous assessment completed on: "
-                f"{st.session_state.original_assessment.timestamp.split('T')[0]}"
+                f"Previous assessment completed on: " f"{st.session_state.original_assessment.timestamp.split('T')[0]}"
             )
-
         with col1:
             reviewer_name = st.text_input(
                 "Reviewer Name *",
-                value=st.session_state.prefilled_data.get('reviewer_name', ''),
-                help="Person conducting this assessment"
+                value=st.session_state.prefilled_data.get("reviewer_name", ""),
+                help="Person conducting this assessment",
             )
-
         # Organization is now selected from dropdown above, no need for text input
         # Use the selected organization name
         organization = (
-            st.session_state.selected_organization 
-            if (st.session_state.selected_organization 
-                and st.session_state.selected_organization != "Select an organization...")
+            st.session_state.selected_organization
+            if (
+                st.session_state.selected_organization
+                and st.session_state.selected_organization != "Select an organization..."
+            )
             else None
         )
-
     if not reviewer_name or not organization:
         st.warning("Please fill in the reviewer name and select an organization before proceeding.")
         return None
-
     # Group questions by level and process area
     questions_by_level = {}
     for question in questions:
@@ -138,123 +119,86 @@ def render_assessment_form(questions: List[TMMiQuestion]
         if question.process_area not in questions_by_level[question.level]:
             questions_by_level[question.level][question.process_area] = []
         questions_by_level[question.level][question.process_area].append(question)
-
     # Store answers in session state
-    if 'assessment_answers' not in st.session_state:
+    if "assessment_answers" not in st.session_state:
         st.session_state.assessment_answers = {}
-
     # Progress tracking
     total_questions = len(questions)
     answered_questions = len(st.session_state.assessment_answers)
     progress = answered_questions / total_questions if total_questions > 0 else 0
-
     st.markdown("### Assessment Progress")
     st.progress(progress)
     st.caption(f"{answered_questions}/{total_questions} questions answered ({progress:.1%})")
-
     # Render questions by level
     st.markdown("### Assessment Questions")
-
-    level_names = {
-        2: "Level 2 - Managed",
-        3: "Level 3 - Defined",
-        4: "Level 4 - Measured",
-        5: "Level 5 - Optimized"
-    }
-
+    level_names = {2: "Level 2 - Managed", 3: "Level 3 - Defined", 4: "Level 4 - Measured", 5: "Level 5 - Optimized"}
     for level in sorted(questions_by_level.keys()):
         with st.expander(f"{level_names.get(level, f'Level {level}')}", expanded=level == 2):
-
             for process_area in sorted(questions_by_level[level].keys()):
                 st.markdown(f"**{process_area}**")
-
                 for question in questions_by_level[level][process_area]:
                     render_question(question)
-
                 st.markdown("---")
-
     # Assessment submission
     st.markdown("### Submit Assessment")
-
     if answered_questions == 0:
         st.info("Please answer at least one question before submitting.")
         return None
-
     # Show change summary if this is a reassessment
     if st.session_state.original_assessment:
-        render_change_summary_before_submit(st.session_state.original_assessment,
-                                            st.session_state.assessment_answers,
-                                            reviewer_name, organization)
-
+        render_change_summary_before_submit(
+            st.session_state.original_assessment, st.session_state.assessment_answers, reviewer_name, organization
+        )
     col1, col2, col3 = st.columns([1, 1, 2])
-
     with col1:
         if st.button("Save Assessment", type="primary"):
             # Create assessment object
             answers = [
                 AssessmentAnswer(
                     question_id=q_id,
-                    answer=answer_data['answer'],
-                    evidence_url=answer_data.get('evidence_url'),
-                    comment=answer_data.get('comment')
+                    answer=answer_data["answer"],
+                    evidence_url=answer_data.get("evidence_url"),
+                    comment=answer_data.get("comment"),
                 )
                 for q_id, answer_data in st.session_state.assessment_answers.items()
             ]
-
-            assessment = Assessment(
-                reviewer_name=reviewer_name,
-                organization=organization,
-                answers=answers
-            )
-
+            assessment = Assessment(reviewer_name=reviewer_name, organization=organization, answers=answers)
             return assessment
-
     with col2:
         if st.button("Clear All"):
             st.session_state.assessment_answers = {}
             st.rerun()
-
     with col3:
         st.caption(f"Progress: {answered_questions}/{total_questions} questions answered")
-
     return None
 
 
-def render_change_summary_before_submit(original_assessment: Assessment,
-                                        current_answers: Dict,
-                                        current_reviewer: str,
-                                        current_organization: str):
+def render_change_summary_before_submit(
+    original_assessment: Assessment, current_answers: Dict, current_reviewer: str, current_organization: str
+):
     """Show summary of changes before submitting reassessment"""
-
     with st.expander("Change Summary", expanded=False):
         st.markdown("**Summary of changes from previous assessment:**")
-
         changes = []
-
         # Check metadata changes
         if current_reviewer != original_assessment.reviewer_name:
             changes.append(f"Reviewer: {original_assessment.reviewer_name} → {current_reviewer}")
-
         if current_organization != original_assessment.organization:
             changes.append(f"Organization: {original_assessment.organization} → {current_organization}")
-
         # Check answer changes
         original_answers = {ans.question_id: ans for ans in original_assessment.answers}
-
         for question_id, current_data in current_answers.items():
             if question_id in original_answers:
                 original_ans = original_answers[question_id]
-
                 # Check answer change
-                if current_data.get('answer') != original_ans.answer:
+                if current_data.get("answer") != original_ans.answer:
                     changes.append(
                         f"Q{question_id.split('_')[-1]} Answer: {original_ans.answer} → "
                         f"{current_data.get('answer')}"
                     )
-
                 # Check evidence change
-                original_evidence = original_ans.evidence_url or ''
-                current_evidence = current_data.get('evidence_url', '')
+                original_evidence = original_ans.evidence_url or ""
+                current_evidence = current_data.get("evidence_url", "")
                 if current_evidence != original_evidence:
                     if original_evidence and current_evidence:
                         changes.append(f"Q{question_id.split('_')[-1]} Evidence: Modified")
@@ -262,10 +206,9 @@ def render_change_summary_before_submit(original_assessment: Assessment,
                         changes.append(f"Q{question_id.split('_')[-1]} Evidence: Added")
                     else:
                         changes.append(f"Q{question_id.split('_')[-1]} Evidence: Removed")
-
                 # Check comment change
-                original_comment = original_ans.comment or ''
-                current_comment = current_data.get('comment', '')
+                original_comment = original_ans.comment or ""
+                current_comment = current_data.get("comment", "")
                 if current_comment != original_comment:
                     if original_comment and current_comment:
                         changes.append(f"Q{question_id.split('_')[-1]} Comment: Modified")
@@ -276,12 +219,10 @@ def render_change_summary_before_submit(original_assessment: Assessment,
             else:
                 # New answer
                 changes.append(f"Q{question_id.split('_')[-1]}: New answer added ({current_data.get('answer')})")
-
         # Check for removed answers
         for question_id in original_answers.keys():
             if question_id not in current_answers:
                 changes.append(f"Q{question_id.split('_')[-1]}: Answer removed")
-
         if changes:
             st.markdown(f"**Total Changes: {len(changes)}**")
             for change in changes:
@@ -292,43 +233,35 @@ def render_change_summary_before_submit(original_assessment: Assessment,
 
 def render_question(question: TMMiQuestion):
     """Render a single assessment question with change tracking"""
-
     # Question container
     question_key = f"q_{question.id}"
-
     # Display question first
     st.markdown(f"**Q{question.id.split('_')[-1]}:** {question.question}")
-    
+
     # Display color-coded priority below question
-    priority_colors = {
-        'High': '#dc3545',    # Red
-        'Medium': '#fd7e14',  # Orange  
-        'Low': '#28a745'      # Green
-    }
-    priority_color = priority_colors.get(question.importance, '#6c757d')
+    priority_colors = {"High": "#dc3545", "Medium": "#fd7e14", "Low": "#28a745"}  # Red  # Orange  # Green
+    priority_color = priority_colors.get(question.importance, "#6c757d")
     st.markdown(
         f'<span style="color: {priority_color}; font-weight: 500;">Priority: {question.importance}</span>',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-
     # Get original values for comparison
     original_answer = None
-    original_evidence = ''
-    original_comment = ''
-    
+    original_evidence = ""
+    original_comment = ""
+
     if st.session_state.original_assessment:
         for ans in st.session_state.original_assessment.answers:
             if ans.question_id == question.id:
                 original_answer = ans.answer
-                original_evidence = ans.evidence_url or ''
-                original_comment = ans.comment or ''
+                original_evidence = ans.evidence_url or ""
+                original_comment = ans.comment or ""
                 break
-
     # Determine what the initial/expected values should be
     expected_answer = original_answer  # None if no previous assessment
     expected_evidence = original_evidence or ""
     expected_comment = original_comment or ""
-    
+
     # Get actual current values from session state
     current_answer = st.session_state.get(f"{question_key}_answer")
     current_evidence = st.session_state.get(f"{question_key}_evidence")
@@ -339,7 +272,7 @@ def render_question(question: TMMiQuestion):
         # If current value is None, widget hasn't been interacted with yet, so use expected
         if current_val is None:
             current_val = expected_val
-            
+
         if st.session_state.original_assessment:
             # Has previous assessment - compare with original
             if current_val == expected_val:
@@ -349,7 +282,7 @@ def render_question(question: TMMiQuestion):
         else:
             # No previous assessment - compare with defaults
             if current_val == "" or current_val is None:
-                return "🟢 Unchanged", "#28a745" 
+                return "🟢 Unchanged", "#28a745"
             else:
                 return "🟡 Modified", "#fd7e14"
 
@@ -357,118 +290,89 @@ def render_question(question: TMMiQuestion):
     answer_status, answer_color = get_change_status(current_answer, expected_answer)
     evidence_status, evidence_color = get_change_status(current_evidence, expected_evidence)
     comment_status, comment_color = get_change_status(current_comment, expected_comment)
-
     # Radio button with dynamic status
-    answer_label = (f'Assessment (required) '
-                    f'<span style="color: {answer_color}; font-weight: 500;">{answer_status}</span>')
+    answer_label = (
+        f"Assessment (required) " f'<span style="color: {answer_color}; font-weight: 500;">{answer_status}</span>'
+    )
     st.markdown(answer_label, unsafe_allow_html=True)
-    
+
     answer = st.radio(
         "Assessment (required)",
-        options=['Yes', 'Partial', 'No'],
-        index=['Yes', 'Partial', 'No'].index(expected_answer) if expected_answer else None,
+        options=["Yes", "Partial", "No"],
+        index=["Yes", "Partial", "No"].index(expected_answer) if expected_answer else None,
         key=f"{question_key}_answer",
         horizontal=True,
-        label_visibility="collapsed"
+        label_visibility="collapsed",
     )
-
     # Evidence field with dynamic status
-    evidence_label = (f'Evidence/Reference URL (optional) '
-                      f'<span style="color: {evidence_color}; font-weight: 500;">{evidence_status}</span>')
+    evidence_label = (
+        f"Evidence/Reference URL (optional) "
+        f'<span style="color: {evidence_color}; font-weight: 500;">{evidence_status}</span>'
+    )
     st.markdown(evidence_label, unsafe_allow_html=True)
-    
+
     evidence_url = st.text_input(
         "Evidence/Reference URL (optional)",
         value=expected_evidence,
         key=f"{question_key}_evidence",
         help="Link to supporting documentation or evidence",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
     )
-
     # Comment field with dynamic status
-    comment_label = (f'Comments (optional) '
-                     f'<span style="color: {comment_color}; font-weight: 500;">{comment_status}</span>')
+    comment_label = (
+        f"Comments (optional) " f'<span style="color: {comment_color}; font-weight: 500;">{comment_status}</span>'
+    )
     st.markdown(comment_label, unsafe_allow_html=True)
-    
+
     comment = st.text_area(
         "Comments (optional)",
         value=expected_comment,
         key=f"{question_key}_comment",
         height=80,
         help="Additional notes or context for this answer",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
     )
-
     # Show recommendation if not fully compliant
-    if answer in ['Partial', 'No']:
+    if answer in ["Partial", "No"]:
         with st.expander("Improvement Recommendation"):
             st.info(f"**Recommended Activity:** {question.recommended_activity}")
             if question.reference_url:
                 st.markdown(f"[Reference Documentation]({question.reference_url})")
-
     # Update session state
     if answer:
         if question.id not in st.session_state.assessment_answers:
             st.session_state.assessment_answers[question.id] = {}
-
-        st.session_state.assessment_answers[question.id].update({
-            'answer': answer,
-            'evidence_url': evidence_url,
-            'comment': comment
-        })
-
+        st.session_state.assessment_answers[question.id].update(
+            {"answer": answer, "evidence_url": evidence_url, "comment": comment}
+        )
     st.markdown("")  # Add spacing
 
 
 def render_assessment_success(assessment_id: int, questions: List[TMMiQuestion]):
     """Render success message after assessment submission"""
-
     st.success(f"Assessment saved successfully! (ID: {assessment_id})")
-
     # Load and display summary
     db = TMMiDatabase()
     assessments = db.get_assessments()
-
     if assessments:
         latest_assessment = assessments[0]  # Most recent
         summary = generate_assessment_summary(questions, latest_assessment)
-
         # Quick summary
         col1, col2, col3, col4 = st.columns(4)
-
         with col1:
-            st.metric(
-                "Current TMMi Level",
-                f"Level {summary['current_level']}",
-                help=summary['level_explanation']
-            )
-
+            st.metric("Current TMMi Level", f"Level {summary['current_level']}", help=summary["level_explanation"])
         with col2:
-            st.metric(
-                "Overall Compliance",
-                f"{summary['overall_percentage']:.1f}%"
-            )
-
+            st.metric("Overall Compliance", f"{summary['overall_percentage']:.1f}%")
         with col3:
-            st.metric(
-                "Questions Answered",
-                f"{summary['answered_questions']}/{summary['total_questions']}"
-            )
-
+            st.metric("Questions Answered", f"{summary['answered_questions']}/{summary['total_questions']}")
         with col4:
-            st.metric(
-                "High Priority Gaps",
-                len(summary['high_priority_gaps'])
-            )
-
+            st.metric("High Priority Gaps", len(summary["high_priority_gaps"]))
         # Action buttons
         col1, col2 = st.columns(2)
-
         with col1:
             if st.button("View Dashboard"):
-                st.session_state.page = 'dashboard'
+                st.session_state.page = "dashboard"
                 st.rerun()
-
         with col2:
             if st.button("New Assessment"):
                 st.session_state.assessment_answers = {}
@@ -477,54 +381,42 @@ def render_assessment_success(assessment_id: int, questions: List[TMMiQuestion])
 
 def render_assessment_history():
     """Render assessment history table"""
-
     st.header("Assessment History")
-
     db = TMMiDatabase()
     assessments = db.get_assessments()
-
     if not assessments:
         st.info("No assessments found. Complete your first assessment to see history here.")
         return
-
     # Create summary table
     history_data = []
     for assessment in assessments:
-        yes_count = sum(1 for ans in assessment.answers if ans.answer == 'Yes')
-        partial_count = sum(1 for ans in assessment.answers if ans.answer == 'Partial')
-        no_count = sum(1 for ans in assessment.answers if ans.answer == 'No')
+        yes_count = sum(1 for ans in assessment.answers if ans.answer == "Yes")
+        partial_count = sum(1 for ans in assessment.answers if ans.answer == "Partial")
+        no_count = sum(1 for ans in assessment.answers if ans.answer == "No")
         total_answered = len(assessment.answers)
-
         compliance = (yes_count / total_answered * 100) if total_answered > 0 else 0
-
-        history_data.append({
-            'ID': assessment.id,
-            'Date': assessment.timestamp.split('T')[0],  # Just date part
-            'Reviewer': assessment.reviewer_name,
-            'Organization': assessment.organization,
-            'Questions Answered': total_answered,
-            'Yes': yes_count,
-            'Partial': partial_count,
-            'No': no_count,
-            'Compliance %': f"{compliance:.1f}%"
-        })
-
-    st.dataframe(
-        history_data,
-        use_container_width=True,
-        hide_index=True
-    )
-
+        history_data.append(
+            {
+                "ID": assessment.id,
+                "Date": assessment.timestamp.split("T")[0],  # Just date part
+                "Reviewer": assessment.reviewer_name,
+                "Organization": assessment.organization,
+                "Questions Answered": total_answered,
+                "Yes": yes_count,
+                "Partial": partial_count,
+                "No": no_count,
+                "Compliance %": f"{compliance:.1f}%",
+            }
+        )
+    st.dataframe(history_data, use_container_width=True, hide_index=True)
     # Assessment details
     if history_data:
         st.markdown("### Assessment Details")
-
         selected_id = st.selectbox(
             "Select assessment to view details:",
-            options=[item['ID'] for item in history_data],
-            format_func=lambda x: f"Assessment {x} - {next(item['Date'] for item in history_data if item['ID'] == x)}"
+            options=[item["ID"] for item in history_data],
+            format_func=lambda x: f"Assessment {x} - {next(item['Date'] for item in history_data if item['ID'] == x)}",
         )
-
         if selected_id:
             selected_assessment = next(a for a in assessments if a.id == selected_id)
             render_assessment_details(selected_assessment)
@@ -532,9 +424,7 @@ def render_assessment_history():
 
 def render_assessment_details(assessment: Assessment):
     """Render detailed view of a specific assessment"""
-
     with st.expander(f"Assessment {assessment.id} Details", expanded=True):
-
         # Metadata
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -543,17 +433,16 @@ def render_assessment_details(assessment: Assessment):
             st.write(f"**Reviewer:** {assessment.reviewer_name}")
         with col3:
             st.write(f"**Organization:** {assessment.organization}")
-
         # Answers breakdown
         st.markdown("**Answers:**")
-
         answer_data = []
         for answer in assessment.answers:
-            answer_data.append({
-                'Question ID': answer.question_id,
-                'Answer': answer.answer,
-                'Evidence': 'Yes' if answer.evidence_url else 'No',
-                'Comments': 'Yes' if answer.comment else 'No'
-            })
-
+            answer_data.append(
+                {
+                    "Question ID": answer.question_id,
+                    "Answer": answer.answer,
+                    "Evidence": "Yes" if answer.evidence_url else "No",
+                    "Comments": "Yes" if answer.comment else "No",
+                }
+            )
         st.dataframe(answer_data, use_container_width=True, hide_index=True)

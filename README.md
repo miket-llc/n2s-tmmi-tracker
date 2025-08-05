@@ -1,7 +1,10 @@
 # N2S TMMi Tracker
 
 A Streamlit application for evaluating and tracking progress toward TMMi (Test Maturity Model Integration) certification.
+
+
 ## Project Structure
+
 ```
 
 n2s-tmmi-tracker/
@@ -19,27 +22,43 @@ n2s-tmmi-tracker/
 
 ```
 
+
 ## Features
 
 - **Assessment Engine**: Complete assessments organized by TMMi Level and Process Area
+
 - **Historical Tracking**: Store and analyze assessment results over time
+
 - **Dashboard**: Visualize maturity progress and identify gaps
+
 - **Recommendations**: Get specific guidance for improvement
+
 - **Evidence Management**: Track supporting documentation and links
+
+
 ## Getting Started
 
 1. Install dependencies:
-   ```bash
+
+```bash
    pip install -r requirements.txt
-   ```
-2. Run the application:
-   ```bash
+
+```
+
+1. Run the application:
+
+```bash
    streamlit run app.py
-   ```
+
+```
+
 
 ## TMMi Levels
 
 - **Level 2**: Managed - Basic test management processes
+
 - **Level 3**: Defined - Standardized test processes across organization
+
 - **Level 4**: Measured - Quantitative test process management
+
 - **Level 5**: Optimized - Continuous test process improvement
