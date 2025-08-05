@@ -296,56 +296,107 @@ def render_question(question: TMMiQuestion):
     # Question container
     question_key = f"q_{question.id}"
 
-    # Show importance level - properly formatted and aligned
-    col1, col2 = st.columns([3, 1])
-
-    with col1:
-        # Display question with priority badge inline
-        priority_class = f"status-{question.importance.lower()}"
-        question_html = (
-            f'<div style="display: flex; align-items: center; gap: 8px;">'
-            f'<span><strong>Q{question.id.split("_")[-1]}:</strong> {question.question}</span>'
-            f'<span class="{priority_class}" style="font-size: 0.8em; padding: 2px 6px; '
-            f'border-radius: 4px; background-color: var(--background-color);">'
-            f'Priority: {question.importance}</span>'
-            f'</div>'
-        )
-        st.markdown(question_html, unsafe_allow_html=True)
+    # Display question first
+    st.markdown(f"**Q{question.id.split('_')[-1]}:** {question.question}")
     
-    with col2:
-        # Show level info
-        st.caption(f"Level {question.level}")
+    # Display color-coded priority below question
+    priority_colors = {
+        'High': '#dc3545',    # Red
+        'Medium': '#fd7e14',  # Orange  
+        'Low': '#28a745'      # Green
+    }
+    priority_color = priority_colors.get(question.importance, '#6c757d')
+    st.markdown(
+        f'<span style="color: {priority_color}; font-weight: 500;">Priority: {question.importance}</span>',
+        unsafe_allow_html=True
+    )
 
-    # Get original answer for comparison (if needed for change tracking)
-    # Note: Original answer tracking is available in session state if needed
+    # Get original values for comparison
+    original_answer = None
+    original_evidence = ''
+    original_comment = ''
+    
+    if st.session_state.original_assessment:
+        for ans in st.session_state.original_assessment.answers:
+            if ans.question_id == question.id:
+                original_answer = ans.answer
+                original_evidence = ans.evidence_url or ''
+                original_comment = ans.comment or ''
+                break
 
-    # Answer selection
-    current_answer = st.session_state.assessment_answers.get(question.id, {}).get('answer', None)
+    # Determine what the initial/expected values should be
+    expected_answer = original_answer  # None if no previous assessment
+    expected_evidence = original_evidence or ""
+    expected_comment = original_comment or ""
+    
+    # Get actual current values from session state
+    current_answer = st.session_state.get(f"{question_key}_answer")
+    current_evidence = st.session_state.get(f"{question_key}_evidence")
+    current_comment = st.session_state.get(f"{question_key}_comment")
 
+    # Helper function to get change status
+    def get_change_status(current_val, expected_val):
+        # If current value is None, widget hasn't been interacted with yet, so use expected
+        if current_val is None:
+            current_val = expected_val
+            
+        if st.session_state.original_assessment:
+            # Has previous assessment - compare with original
+            if current_val == expected_val:
+                return "🟢 Unchanged", "#28a745"
+            else:
+                return "🟡 Modified", "#fd7e14"
+        else:
+            # No previous assessment - compare with defaults
+            if current_val == "" or current_val is None:
+                return "🟢 Unchanged", "#28a745" 
+            else:
+                return "🟡 Modified", "#fd7e14"
+
+    # Get change statuses
+    answer_status, answer_color = get_change_status(current_answer, expected_answer)
+    evidence_status, evidence_color = get_change_status(current_evidence, expected_evidence)
+    comment_status, comment_color = get_change_status(current_comment, expected_comment)
+
+    # Radio button with dynamic status
+    answer_label = (f'Assessment (required) '
+                    f'<span style="color: {answer_color}; font-weight: 500;">{answer_status}</span>')
+    st.markdown(answer_label, unsafe_allow_html=True)
+    
     answer = st.radio(
-        "Answer",
+        "Assessment (required)",
         options=['Yes', 'Partial', 'No'],
-        index=['Yes', 'Partial', 'No'].index(current_answer) if current_answer else None,
+        index=['Yes', 'Partial', 'No'].index(expected_answer) if expected_answer else None,
         key=f"{question_key}_answer",
         horizontal=True,
         label_visibility="collapsed"
     )
 
-    # Evidence URL field
+    # Evidence field with dynamic status
+    evidence_label = (f'Evidence/Reference URL (optional) '
+                      f'<span style="color: {evidence_color}; font-weight: 500;">{evidence_status}</span>')
+    st.markdown(evidence_label, unsafe_allow_html=True)
+    
     evidence_url = st.text_input(
         "Evidence/Reference URL (optional)",
-        value=st.session_state.assessment_answers.get(question.id, {}).get('evidence_url', ''),
+        value=expected_evidence,
         key=f"{question_key}_evidence",
-        help="Link to supporting documentation or evidence"
+        help="Link to supporting documentation or evidence",
+        label_visibility="collapsed"
     )
 
-    # Comment field
+    # Comment field with dynamic status
+    comment_label = (f'Comments (optional) '
+                     f'<span style="color: {comment_color}; font-weight: 500;">{comment_status}</span>')
+    st.markdown(comment_label, unsafe_allow_html=True)
+    
     comment = st.text_area(
         "Comments (optional)",
-        value=st.session_state.assessment_answers.get(question.id, {}).get('comment', ''),
+        value=expected_comment,
         key=f"{question_key}_comment",
         height=80,
-        help="Additional notes or context for this answer"
+        help="Additional notes or context for this answer",
+        label_visibility="collapsed"
     )
 
     # Show recommendation if not fully compliant
