@@ -149,6 +149,14 @@ sed -i '' 's/^######/\n######/g' *.md prompts/*.md
 sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
 
 ```
+#### Fix Multiple Blank Lines (MD012)
+```bash
+# Remove multiple consecutive blank lines (zsh compatible)
+sed -i '' '/^$/{N;/^\n$/d;}' *.md prompts/*.md
+
+# Alternative approach if the above doesn't work
+sed -i '' '/^$/,/^$/d' *.md prompts/*.md
+```
 ### Phase 4: Auto-Formatting (5 minutes)
 
 #### Use Black for Complex Indentation
@@ -247,7 +255,8 @@ result = some_function(
 3. **Check markdown files** - they often have tab/whitespace/heading spacing issues
 4. **Verify after each phase** - don't wait until the end
 5. **Preserve functionality** - only fix style, not logic
-6. **Don't forget markdown linting** - MD010, MD022 are common issues
+6. **Don't forget markdown linting** - MD010, MD022, MD031, MD012 are common issues
+7. **Use zsh-compatible sed commands** - avoid quote issues in zsh shell
 
 ## 🚀 Quick Commands for Future Use
 ```bash
