@@ -3,10 +3,17 @@ Sample data initialization for N2S TMMi Tracker
 Automatically creates sample data when no organizations exist
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import List
-import logging
-from src.models.database import TMMiDatabase, Assessment, AssessmentAnswer, load_tmmi_questions
+
+from src.models.database import (
+    Assessment,
+    AssessmentAnswer,
+    TMMiDatabase,
+    TMMiQuestion,
+    load_tmmi_questions,
+)
 
 
 def create_sample_organization(db: TMMiDatabase) -> int:
@@ -23,15 +30,18 @@ def create_sample_organization(db: TMMiDatabase) -> int:
 
 
 def generate_progressive_answers(
-    questions: List[dict], target_level: int, assessment_number: int, total_assessments: int
+    questions: List[TMMiQuestion],
+    target_level: int,
+    assessment_number: int,
+    total_assessments: int,
 ) -> List[AssessmentAnswer]:
     """Generate answers that show realistic progression over time"""
     answers = []
     # Calculate progression factor (0.0 to 1.0)
     progression = assessment_number / (total_assessments - 1)
     for question in questions:
-        q_level = question["level"]
-        q_id = question["id"]
+        q_level = question.level
+        q_id = question.id
         # Determine answer based on progression and level
         if q_level < target_level:
             # Lower levels should be mostly "Yes" as we progress
@@ -64,11 +74,18 @@ def generate_progressive_answers(
             evidence_url = f"https://docs.sampletest.org/{q_id.lower()}"
         if answer == "Partial":
             comment = f"Implementation in progress - Assessment {assessment_number + 1}"
-        answers.append(AssessmentAnswer(question_id=q_id, answer=answer, evidence_url=evidence_url, comment=comment))
+        answers.append(
+            AssessmentAnswer(
+                question_id=q_id,
+                answer=answer,
+                evidence_url=evidence_url,
+                comment=comment,
+            )
+        )
     return answers
 
 
-def create_sample_assessments(db: TMMiDatabase, org_id: int, questions: List[dict]) -> List[int]:
+def create_sample_assessments(db: TMMiDatabase, org_id: int, questions: List[TMMiQuestion]) -> List[int]:
     """Create 8 sample assessments showing progression from Level 2 to 4+"""
     # Assessment timeline: spread over 18 months
     start_date = datetime.now() - timedelta(days=540)  # 18 months ago
