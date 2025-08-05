@@ -1,0 +1,106 @@
+import os
+import sys
+
+# Ensure the project root is on the import path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.utils.scoring import (
+    calculate_level_compliance,
+    calculate_process_area_compliance,
+    calculate_evidence_coverage,
+)
+from src.models.database import TMMiQuestion, AssessmentAnswer
+import pytest
+
+
+def build_sample_data():
+    questions = [
+        TMMiQuestion(
+            id="Q1",
+            level=2,
+            process_area="PA1",
+            question="Question 1",
+            importance="High",
+            recommended_activity="",
+            reference_url="",
+        ),
+        TMMiQuestion(
+            id="Q2",
+            level=2,
+            process_area="PA2",
+            question="Question 2",
+            importance="Medium",
+            recommended_activity="",
+            reference_url="",
+        ),
+        TMMiQuestion(
+            id="Q3",
+            level=3,
+            process_area="PA1",
+            question="Question 3",
+            importance="Low",
+            recommended_activity="",
+            reference_url="",
+        ),
+        TMMiQuestion(
+            id="Q4",
+            level=3,
+            process_area="PA2",
+            question="Question 4",
+            importance="Low",
+            recommended_activity="",
+            reference_url="",
+        ),
+    ]
+
+    answers = [
+        AssessmentAnswer(question_id="Q1", answer="Yes", evidence_url="http://evidence1"),
+        AssessmentAnswer(question_id="Q2", answer="Partial"),
+        AssessmentAnswer(question_id="Q3", answer="No", evidence_url="http://evidence3"),
+    ]
+
+    return questions, answers
+
+
+def test_calculate_level_compliance():
+    questions, answers = build_sample_data()
+    result = calculate_level_compliance(questions, answers)
+
+    level2 = result[2]
+    assert level2["compliance_percentage"] == pytest.approx(75.0)
+    assert level2["yes_count"] == 1
+    assert level2["partial_count"] == 1
+    assert level2["no_count"] == 0
+    assert level2["answered_questions"] == 2
+
+    level3 = result[3]
+    assert level3["compliance_percentage"] == pytest.approx(0.0)
+    assert level3["yes_count"] == 0
+    assert level3["partial_count"] == 0
+    assert level3["no_count"] == 1
+    assert level3["answered_questions"] == 1
+
+
+def test_calculate_process_area_compliance():
+    questions, answers = build_sample_data()
+    result = calculate_process_area_compliance(questions, answers)
+
+    pa1 = result["PA1"]
+    assert pa1["compliance_percentage"] == pytest.approx(50.0)
+    assert pa1["yes_count"] == 1
+    assert pa1["no_count"] == 1
+    assert pa1["answered_questions"] == 2
+
+    pa2 = result["PA2"]
+    assert pa2["compliance_percentage"] == pytest.approx(25.0)
+    assert pa2["partial_count"] == 1
+    assert pa2["answered_questions"] == 1
+
+
+def test_calculate_evidence_coverage():
+    _, answers = build_sample_data()
+    result = calculate_evidence_coverage(answers)
+
+    assert result["with_evidence"] == 2
+    assert result["total_answers"] == 3
+    assert result["percentage"] == pytest.approx(66.6666666667)
