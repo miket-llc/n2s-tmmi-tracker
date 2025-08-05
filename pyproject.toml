@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "n2s-tmmi-tracker"
-version = "1.1.0"
+version = "1.2.0"
 description = "Professional Test Maturity Model Integration (TMMi) Assessment Platform"
 authors = [{name = "TMMi Assessment Team"}]
 requires-python = ">=3.8"
