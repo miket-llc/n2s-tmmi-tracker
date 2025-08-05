@@ -113,4 +113,3 @@ def get_deployment_info() -> Optional[str]:
         return "Docker"
     # Don't show "Local Development" as it's not useful
     return None
-

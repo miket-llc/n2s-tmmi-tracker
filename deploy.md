@@ -85,11 +85,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
+
     - name: Create backup before deployment
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -102,7 +102,7 @@ jobs:
           if [ -f "${{ secrets.TMMI_DB_PATH }}" ]; then
             cp "${{ secrets.TMMI_DB_PATH }}" "${{ secrets.TMMI_BACKUP_DIR }}/pre_deploy_$(date +%Y%m%d_%H%M%S).db"
           fi
-    
+
     - name: Deploy to server
       uses: appleboy/ssh-action@v0.1.5
       with:
@@ -112,18 +112,18 @@ jobs:
         script: |
           cd /app/tmmi-tracker
           git pull origin main
-          
+
           # Set environment variables
           export TMMI_DB_PATH="${{ secrets.TMMI_DB_PATH }}"
           export TMMI_BACKUP_DIR="${{ secrets.TMMI_BACKUP_DIR }}"
-          
+
           # Restart application
           pkill -f "streamlit run app.py" || true
           nohup ./run_app.sh > deploy.log 2>&1 &
-          
+
           # Wait for application to start
           sleep 10
-          
+
           # Health check
           curl -f http://localhost:8501/_stcore/health || exit 1
 ```

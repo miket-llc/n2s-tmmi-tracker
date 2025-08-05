@@ -8,7 +8,7 @@ I've implemented comprehensive database persistence for your N2S TMMi Tracker to
 
 ### 1. Environment-Based Configuration ✅
 - **Database Path**: Configurable via `TMMI_DB_PATH` environment variable
-- **Backup Directory**: Configurable via `TMMI_BACKUP_DIR` environment variable  
+- **Backup Directory**: Configurable via `TMMI_BACKUP_DIR` environment variable
 - **Questions File**: Configurable via `TMMI_QUESTIONS_PATH` environment variable
 - **Backward Compatibility**: Defaults to existing paths if env vars not set
 
@@ -95,7 +95,7 @@ export TMMI_QUESTIONS_PATH="/path/to/persistent/tmmi_questions.json"
 
 ## Next Steps
 
-1. **Test the Implementation**: 
+1. **Test the Implementation**:
    - Access "Database Admin" page to verify functionality
    - Create a manual backup to test the system
    - Check database statistics

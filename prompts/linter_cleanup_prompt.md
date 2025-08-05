@@ -1,147 +1,224 @@
-# 🎯 Comprehensive Linter Cleanup Prompt
+# 🎯 Comprehensive Linter Cleanup Guide
 
-## 📊 Current Status
-- ✅ **app.py**: COMPLETED (0 errors)
-- 🔧 **Remaining**: **33 linter errors** across 6 files in `src/components/` and `src/models/`
+## 📊 Overview
+This guide provides a systematic approach to cleaning up linter warnings and errors in both Python (.py) and Markdown (.md) files, based on real-world experience with the N2S TMMi Tracker codebase.
 
-## 🎯 Mission: Achieve 0 linter errors across entire codebase
+## 🔍 Initial Assessment
 
-## 📋 Complete Error Analysis
-
-### 📁 **File Breakdown:**
-- `src/components/__init__.py`: 1 error
-- `src/components/assessment.py`: 18 errors  
-- `src/components/dashboard.py`: 7 errors
-- `src/components/edit_history.py`: 2 errors
-- `src/components/organizations.py`: 2 errors
-- `src/models/__init__.py`: 1 error
-
-### 🔧 **Error Categories (by complexity):**
-
-#### **🟢 QUICK WINS (19 errors - 30 seconds each):**
-
-**Missing Newlines (W292) - 4 errors:**
-- `src/components/__init__.py:1:26`
-- `src/components/dashboard.py:447:80`
-- `src/components/organizations.py:377:62`
-- `src/models/__init__.py:1:30`
-
-**Whitespace Around Operators (E225/E226) - 3 errors:**
-- `src/components/assessment.py:162:87: E225` (missing whitespace around operator)
-- `src/components/dashboard.py:73:46: E226` (missing whitespace around arithmetic operator)
-- `src/components/dashboard.py:73:73: E226` (missing whitespace around arithmetic operator)
-
-**Line Length (E501) - 8 errors:**
-- `src/components/assessment.py:79:121` (163 > 120 chars)
-- `src/components/assessment.py:90:121` (123 > 120 chars)
-- `src/components/assessment.py:98:121` (130 > 120 chars)
-- `src/components/assessment.py:99:121` (123 > 120 chars)
-- `src/components/assessment.py:246:121` (129 > 120 chars)
-- `src/components/assessment.py:305:121` (135 > 120 chars)
-- `src/components/dashboard.py:304:121` (124 > 120 chars)
-- `src/components/organizations.py:58:121` (121 > 120 chars)
-
-**Line Break Style (W504) - 2 errors:**
-- `src/components/assessment.py:109:54`
-- `src/components/assessment.py:121:54`
-
-**Simple Indentation (E129) - 2 errors:**
-- `src/components/assessment.py:110:17`
-- `src/components/assessment.py:122:17`
-
-#### **🟡 MEDIUM DIFFICULTY (10 errors - 2 minutes each):**
-
-**Visual Indentation (E124/E128) - 10 errors:**
-- `src/components/assessment.py:12:27: E124` (closing bracket)
-- `src/components/assessment.py:182:44: E128` (continuation line under-indented)
-- `src/components/assessment.py:183:44: E128`
-- `src/components/assessment.py:220:39: E128`
-- `src/components/assessment.py:221:39: E128`
-- `src/components/assessment.py:222:39: E128`
-- `src/components/assessment.py:306:20: E128`
-- `src/components/dashboard.py:299:26: E128`
-- `src/components/dashboard.py:374:28: E128`
-- `src/components/dashboard.py:419:28: E128`
-- `src/components/edit_history.py:94:18: E128`
-- `src/components/edit_history.py:140:36: E128`
-
-#### **🔴 COMPLEXITY DECISION (2 errors - 5+ minutes each):**
-
-**Function Complexity (C901) - 2 errors:**
-- `src/components/assessment.py:11:1: 'render_assessment_form' is too complex (26)`
-- `src/components/assessment.py:219:1: 'render_change_summary_before_submit' is too complex (16)`
-
-## 🚀 Execution Strategy
-
-### **Step 1: Quick Wins (15 minutes total)**
+### Step 1: Install and Check Linters
 ```bash
-# Test baseline
-source venv/bin/activate && flake8 src/components/ src/models/ | wc -l
+# Activate virtual environment
+source venv/bin/activate
 
-# Should show 33 errors initially
+# Install required linters
+pip install flake8 pylint black
+
+# Check current status
+flake8 . --exclude=venv --count --show-source --statistics
 ```
 
-**Mechanical fixes (can be batched):**
-1. Add newlines to end of 4 files
-2. Add whitespace around 3 operators  
-3. Split 8 long lines at logical break points
-4. Fix 2 line break styles (move operators)
-5. Fix 2 simple indentation alignments
+### Step 2: Categorize Issues by Priority
 
-### **Step 2: Visual Indentation (20 minutes total)**
-- Fix 10 continuation line indentation issues
-- Align with opening parentheses/brackets
-- Maintain consistent 4-space indentation
+#### 🟢 **CRITICAL FIXES (Must Fix)**
+- **W292**: Missing newline at end of file
+- **E226**: Missing whitespace around arithmetic operator
+- **E501**: Line too long (>120 characters)
+- **E128**: Continuation line under-indented for visual indent
+- **F841**: Local variable assigned but never used
+- **W504**: Line break after binary operator
+- **W391**: Blank line at end of file
+- **MD010**: Hard tabs in markdown files
 
-### **Step 3: Complexity Decision (10 minutes analysis)**
-**Two options:**
-A. **Refactor functions** (20+ minutes):
-   - Break down `render_assessment_form` (complexity 26)
-   - Break down `render_change_summary_before_submit` (complexity 16)
+#### 🟡 **STYLE IMPROVEMENTS (Should Fix)**
+- **W0718**: Catching too general exception Exception
+- **W1514**: Using open without explicitly specifying an encoding
+- **W1203**: Use lazy % formatting in logging functions
+- **W0611**: Unused imports
+- **W0613**: Unused arguments
+- **R1705**: Unnecessary "else" after "return"
+- **R0914**: Too many local variables
+- **R0912**: Too many branches
+- **R0915**: Too many statements
 
-B. **Adjust complexity limit** (2 minutes):
-   - Update flake8 config: `max-complexity = 30`
-   - Reasoning: These are UI rendering functions with legitimate complexity
+## 🛠️ Systematic Fix Process
 
-### **Step 4: Verification**
+### Phase 1: Quick Wins (15 minutes)
+
+#### 1. Fix Missing Newlines (W292)
 ```bash
-# After each fix category, test:
-source venv/bin/activate && flake8 src/components/ src/models/
+# Add newlines to files
+echo -e "\n" >> src/__init__.py
+echo -e "\n" >> src/components/debug.py
+echo -e "\n" >> src/components/manual_sample.py
+echo -e "\n" >> src/components/progress.py
+echo -e "\n" >> src/utils/__init__.py
+echo -e "\n" >> src/utils/sample_data.py
+```
 
-# Final verification:
-source venv/bin/activate && flake8 src/components/ src/models/ | wc -l
-# Should show 0
+#### 2. Fix Whitespace Around Operators (E226)
+```python
+# Before
+status_text.text(f"Creating assessment {i+1}: {scenario['desc']}")
+
+# After
+status_text.text(f"Creating assessment {i + 1}: {scenario['desc']}")
+```
+
+#### 3. Fix Line Length Issues (E501)
+```python
+# Before
+logging.info(f"Verification - Organizations: {len(verification_orgs)}, Assessments: {len(verification_assessments)}")
+
+# After
+logging.info(f"Verification - Organizations: {len(verification_orgs)}, "
+            f"Assessments: {len(verification_assessments)}")
+```
+
+#### 4. Remove Unused Variables (F841)
+```python
+# Before
+assessment_id = db.save_assessment(assessment)
+
+# After
+db.save_assessment(assessment)
+```
+
+### Phase 2: Indentation Fixes (20 minutes)
+
+#### Fix Continuation Line Indentation (E128)
+```python
+# Before
+evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}" 
+             if answer == 'Yes' and i > 3 else None),
+
+# After
+evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}"
+             if answer == 'Yes' and i > 3 else None),
+```
+
+#### Fix Line Break Style (W504)
+```python
+# Before
+hovertemplate='<b>Date:</b> %{x|%Y-%m-%d}<br>' +
+              '<b>TMMi Level:</b> %{y}<br>' +
+              '<b>Compliance:</b> %{customdata:.1f}%<extra></extra>',
+
+# After
+hovertemplate=('<b>Date:</b> %{x|%Y-%m-%d}<br>'
+               + '<b>TMMi Level:</b> %{y}<br>'
+               + '<b>Compliance:</b> %{customdata:.1f}%<extra></extra>'),
+```
+
+### Phase 3: Markdown Cleanup (5 minutes)
+
+#### Fix Hard Tabs (MD010)
+```bash
+# Replace all hard tabs with 4 spaces
+sed -i '' 's/\t/    /g' prompts/original_prompt.md
+
+# Verify no tabs remain
+grep -n $'\t' *.md prompts/*.md
+```
+
+#### Remove Trailing Whitespace
+```bash
+# Remove trailing whitespace from all markdown files
+sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
+```
+
+### Phase 4: Auto-Formatting (5 minutes)
+
+#### Use Black for Complex Indentation
+```bash
+# Auto-format problematic files
+black src/components/manual_sample.py src/components/progress.py src/utils/sample_data.py
+```
+
+## 📋 Verification Checklist
+
+### After Each Phase:
+```bash
+# Check flake8 status
+source venv/bin/activate && flake8 . --exclude=venv --count
+
+# Should show 0 errors when complete
+```
+
+### Final Verification:
+```bash
+# Python linting
+flake8 . --exclude=venv --count
+
+# Markdown check
+find . -name "*.md" -not -path "./venv/*" -exec grep -l $'\t' {} \;
+
+# Should return no output for both
 ```
 
 ## 🎯 Success Criteria
-- ✅ **0 linter errors** in `flake8 src/components/ src/models/`
-- ✅ **All code remains functional** (no logic changes)
-- ✅ **Consistent code style** across all files
 
-## ⏱️ Time Estimates
-- **Quick wins**: 15 minutes
-- **Medium difficulty**: 20 minutes  
-- **Complexity decision**: 2-30 minutes (depending on approach)
-- **Total time**: 37-65 minutes
+### ✅ **COMPLETE SUCCESS:**
+- **0 flake8 errors** in Python files
+- **0 hard tabs** in markdown files
+- **0 trailing whitespace** in markdown files
+- **All code remains functional** (no logic changes)
+- **Consistent code style** across all files
 
-## 🔍 Key Commands for Execution
+### 📊 **Expected Results:**
+- **Before**: 18+ flake8 errors, hard tabs in markdown
+- **After**: 0 flake8 errors, clean markdown formatting
+- **Time**: 45-60 minutes total
+
+## 🔧 Common Issues and Solutions
+
+### Issue: Indentation Problems Persist
+**Solution**: Use `black` auto-formatter
 ```bash
-# Activate environment
+black src/components/problematic_file.py
+```
+
+### Issue: Hard Tabs in Markdown
+**Solution**: Replace with spaces
+```bash
+sed -i '' 's/\t/    /g' filename.md
+```
+
+### Issue: Line Length Still Too Long
+**Solution**: Break at logical points
+```python
+# Break long strings
+long_string = ("This is a very long string that needs "
+              "to be broken into multiple lines")
+
+# Break long function calls
+result = some_function(
+    param1,
+    param2,
+    param3
+)
+```
+
+## 📝 Notes for Future Cleanups
+
+1. **Start with flake8** - it catches the most critical issues
+2. **Use black for complex indentation** - it's more reliable than manual fixes
+3. **Check markdown files** - they often have tab/whitespace issues
+4. **Verify after each phase** - don't wait until the end
+5. **Preserve functionality** - only fix style, not logic
+
+## 🚀 Quick Commands for Future Use
+
+```bash
+# Full cleanup in one go
 source venv/bin/activate
-
-# Check current errors
-flake8 src/components/ src/models/
-
-# Count errors
-flake8 src/components/ src/models/ | wc -l
-
-# Check specific file
-flake8 src/components/assessment.py
-
-# Test after changes
-flake8 src/components/ src/models/ && echo "✅ ALL CLEAN!"
+pip install flake8 black
+flake8 . --exclude=venv --count
+black src/
+sed -i '' 's/\t/    /g' *.md prompts/*.md
+sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
+flake8 . --exclude=venv --count  # Should show 0
 ```
 
 ---
 
-**Ready for systematic execution!** 🚀
+**This guide is based on real-world experience cleaning up the N2S TMMi Tracker codebase and should work for similar Python/Streamlit projects.**

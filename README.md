@@ -42,6 +42,6 @@ n2s-tmmi-tracker/
 ## TMMi Levels
 
 - **Level 2**: Managed - Basic test management processes
-- **Level 3**: Defined - Standardized test processes across organization  
+- **Level 3**: Defined - Standardized test processes across organization
 - **Level 4**: Measured - Quantitative test process management
 - **Level 5**: Optimized - Continuous test process improvement

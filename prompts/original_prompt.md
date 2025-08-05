@@ -7,48 +7,48 @@ You are helping me build a Streamlit application to evaluate and track progress 
 ✅ App Purpose
 
 Build a Streamlit app that does the following:
-	1.	Assess maturity across the five TMMi levels
-	2.	Store historical results over time (SQLite or CSV is fine for now)
-	3.	Display dashboards showing current level, trend over time, and process-area-level insights
-	4.	Provide recommendations based on gaps in compliance
-	5.	Track evidence with links or files for each question
+    1.    Assess maturity across the five TMMi levels
+    2.    Store historical results over time (SQLite or CSV is fine for now)
+    3.    Display dashboards showing current level, trend over time, and process-area-level insights
+    4.    Provide recommendations based on gaps in compliance
+    5.    Track evidence with links or files for each question
 
 ⸻
 
 📂 Key Features
 
 1. Assessment Engine
-	•	Users complete assessments organized by TMMi Level and Process Area
-	•	Each question includes:
-	•	Text of the question
-	•	TMMi level (2–5 only; Level 1 is non-formal)
-	•	Process Area (e.g., Test Policy and Strategy, Test Planning, Test Monitoring and Control, etc.)
-	•	Answer type: Yes / No / Partial
-	•	Evidence URL field (optional)
-	•	Comment field
+    •    Users complete assessments organized by TMMi Level and Process Area
+    •    Each question includes:
+    •    Text of the question
+    •    TMMi level (2–5 only; Level 1 is non-formal)
+    •    Process Area (e.g., Test Policy and Strategy, Test Planning, Test Monitoring and Control, etc.)
+    •    Answer type: Yes / No / Partial
+    •    Evidence URL field (optional)
+    •    Comment field
 
 2. Storage
-	•	Store each completed assessment with:
-	•	Timestamp
-	•	User/reviewer name
-	•	All answers, comments, and evidence
-	•	Auto-computed metrics (see below)
+    •    Store each completed assessment with:
+    •    Timestamp
+    •    User/reviewer name
+    •    All answers, comments, and evidence
+    •    Auto-computed metrics (see below)
 
 3. Computation
-	•	Determine the current TMMi Level based on a predefined scoring threshold (e.g., 80% or more "Yes" per level and all lower levels complete)
-	•	Calculate per–process area coverage (e.g., % complete for "Test Planning")
+    •    Determine the current TMMi Level based on a predefined scoring threshold (e.g., 80% or more "Yes" per level and all lower levels complete)
+    •    Calculate per–process area coverage (e.g., % complete for "Test Planning")
 
 4. Recommendations
-	•	For each "No" or "Partial," suggest:
-	•	Why the item is important
-	•	What activities will help
-	•	Link to external resource (can be stubbed)
+    •    For each "No" or "Partial," suggest:
+    •    Why the item is important
+    •    What activities will help
+    •    Link to external resource (can be stubbed)
 
 5. Visualization
-	•	Line graph: maturity over time
-	•	Table of open gaps and suggested activities
-	•	% of answered questions with evidence
-	•	Filters by date, level, or process area
+    •    Line graph: maturity over time
+    •    Table of open gaps and suggested activities
+    •    % of answered questions with evidence
+    •    Filters by date, level, or process area
 
 ⸻
 
@@ -97,14 +97,14 @@ If you don't have full TMMi coverage, generate a sample JSON/YAML/CSV file with 
 📦 Your Tasks
 
 Start by doing the following:
-	1.	Propose a folder/file structure for the Streamlit app
-	2.	Generate a Streamlit app scaffold that:
-	•	Loads the questions
-	•	Presents them in a clean UI grouped by TMMi Level and Process Area
-	•	Captures user answers, evidence, and comments
-	•	Stores results with timestamp
-	3.	Implement scoring logic and recommendations
-	4.	Create a simple dashboard (use Streamlit's built-in charts)
+    1.    Propose a folder/file structure for the Streamlit app
+    2.    Generate a Streamlit app scaffold that:
+    •    Loads the questions
+    •    Presents them in a clean UI grouped by TMMi Level and Process Area
+    •    Captures user answers, evidence, and comments
+    •    Stores results with timestamp
+    3.    Implement scoring logic and recommendations
+    4.    Create a simple dashboard (use Streamlit's built-in charts)
 
 ⸻
 
