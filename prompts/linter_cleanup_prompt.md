@@ -152,10 +152,11 @@ sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
 #### Fix Multiple Blank Lines (MD012)
 ```bash
 # Remove multiple consecutive blank lines (zsh compatible)
-sed -i '' '/^$/{N;/^\n$/d;}' *.md prompts/*.md
+# Use awk instead of sed for better zsh compatibility
+awk 'NF {print; blank=0} !NF {if (!blank) print; blank=1}' *.md prompts/*.md > temp.md && mv temp.md *.md prompts/*.md
 
-# Alternative approach if the above doesn't work
-sed -i '' '/^$/,/^$/d' *.md prompts/*.md
+# Alternative: use perl for complex operations
+perl -i -pe 's/\n\s*\n\s*\n/\n\n/g' *.md prompts/*.md
 ```
 ### Phase 4: Auto-Formatting (5 minutes)
 
