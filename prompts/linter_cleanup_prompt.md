@@ -6,6 +6,7 @@ This guide provides a systematic approach to cleaning up linter warnings and err
 ## 🔍 Initial Assessment
 
 ### Step 1: Install and Check Linters
+
 ```bash
 # Activate virtual environment
 source venv/bin/activate
@@ -15,8 +16,8 @@ pip install flake8 pylint black
 
 # Check current status
 flake8 . --exclude=venv --count --show-source --statistics
-```
 
+```
 ### Step 2: Categorize Issues by Priority
 
 #### 🟢 **CRITICAL FIXES (Must Fix)**
@@ -29,6 +30,8 @@ flake8 . --exclude=venv --count --show-source --statistics
 - **W391**: Blank line at end of file
 - **MD010**: Hard tabs in markdown files
 - **MD022**: Headings should be surrounded by blank lines
+- **MD031**: Fenced code blocks should be surrounded by blank lines
+- **MD012**: Multiple consecutive blank lines
 
 #### 🟡 **STYLE IMPROVEMENTS (Should Fix)**
 - **W0718**: Catching too general exception Exception
@@ -46,6 +49,7 @@ flake8 . --exclude=venv --count --show-source --statistics
 ### Phase 1: Quick Wins (15 minutes)
 
 #### 1. Fix Missing Newlines (W292)
+
 ```bash
 # Add newlines to files
 echo -e "\n" >> src/__init__.py
@@ -54,18 +58,20 @@ echo -e "\n" >> src/components/manual_sample.py
 echo -e "\n" >> src/components/progress.py
 echo -e "\n" >> src/utils/__init__.py
 echo -e "\n" >> src/utils/sample_data.py
-```
 
+```
 #### 2. Fix Whitespace Around Operators (E226)
+
 ```python
 # Before
 status_text.text(f"Creating assessment {i+1}: {scenario['desc']}")
 
 # After
 status_text.text(f"Creating assessment {i + 1}: {scenario['desc']}")
-```
 
+```
 #### 3. Fix Line Length Issues (E501)
+
 ```python
 # Before
 logging.info(f"Verification - Organizations: {len(verification_orgs)}, Assessments: {len(verification_assessments)}")
@@ -73,20 +79,22 @@ logging.info(f"Verification - Organizations: {len(verification_orgs)}, Assessmen
 # After
 logging.info(f"Verification - Organizations: {len(verification_orgs)}, "
             f"Assessments: {len(verification_assessments)}")
-```
 
+```
 #### 4. Remove Unused Variables (F841)
+
 ```python
 # Before
 assessment_id = db.save_assessment(assessment)
 
 # After
 db.save_assessment(assessment)
-```
 
+```
 ### Phase 2: Indentation Fixes (20 minutes)
 
 #### Fix Continuation Line Indentation (E128)
+
 ```python
 # Before
 evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}" 
@@ -95,9 +103,10 @@ evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}"
 # After
 evidence_url=(f"https://docs.sampletest.org/{question.id.lower()}"
              if answer == 'Yes' and i > 3 else None),
-```
 
+```
 #### Fix Line Break Style (W504)
+
 ```python
 # Before
 hovertemplate='<b>Date:</b> %{x|%Y-%m-%d}<br>' +
@@ -108,20 +117,22 @@ hovertemplate='<b>Date:</b> %{x|%Y-%m-%d}<br>' +
 hovertemplate=('<b>Date:</b> %{x|%Y-%m-%d}<br>'
                + '<b>TMMi Level:</b> %{y}<br>'
                + '<b>Compliance:</b> %{customdata:.1f}%<extra></extra>'),
-```
 
+```
 ### Phase 3: Markdown Cleanup (10 minutes)
 
 #### Fix Hard Tabs (MD010)
+
 ```bash
 # Replace all hard tabs with 4 spaces
 sed -i '' 's/\t/    /g' prompts/original_prompt.md
 
 # Verify no tabs remain
 grep -n $'\t' *.md prompts/*.md
-```
 
+```
 #### Fix Heading Spacing (MD022)
+
 ```bash
 # Add blank lines before all heading levels
 sed -i '' 's/^##/\n##/g' *.md prompts/*.md
@@ -129,33 +140,37 @@ sed -i '' 's/^###/\n###/g' *.md prompts/*.md
 sed -i '' 's/^####/\n####/g' *.md prompts/*.md
 sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
 sed -i '' 's/^######/\n######/g' *.md prompts/*.md
-```
 
+```
 #### Remove Trailing Whitespace
+
 ```bash
 # Remove trailing whitespace from all markdown files
 sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
-```
 
+```
 ### Phase 4: Auto-Formatting (5 minutes)
 
 #### Use Black for Complex Indentation
+
 ```bash
 # Auto-format problematic files
 black src/components/manual_sample.py src/components/progress.py src/utils/sample_data.py
-```
 
+```
 ## 📋 Verification Checklist
 
 ### After Each Phase:
+
 ```bash
 # Check flake8 status
 source venv/bin/activate && flake8 . --exclude=venv --count
 
 # Should show 0 errors when complete
-```
 
+```
 ### Final Verification:
+
 ```bash
 # Python linting
 flake8 . --exclude=venv --count
@@ -164,8 +179,8 @@ flake8 . --exclude=venv --count
 find . -name "*.md" -not -path "./venv/*" -exec grep -l $'\t' {} \;
 
 # Should return no output for both
-```
 
+```
 ## 🎯 Success Criteria
 
 ### ✅ **COMPLETE SUCCESS:**
@@ -185,18 +200,21 @@ find . -name "*.md" -not -path "./venv/*" -exec grep -l $'\t' {} \;
 
 ### Issue: Indentation Problems Persist
 **Solution**: Use `black` auto-formatter
+
 ```bash
 black src/components/problematic_file.py
-```
 
+```
 ### Issue: Hard Tabs in Markdown
 **Solution**: Replace with spaces
+
 ```bash
 sed -i '' 's/\t/    /g' filename.md
-```
 
+```
 ### Issue: Missing Heading Spacing (MD022)
 **Solution**: Add blank lines before headings
+
 ```bash
 # Add blank lines before all heading levels
 sed -i '' 's/^##/\n##/g' *.md prompts/*.md
@@ -204,10 +222,11 @@ sed -i '' 's/^###/\n###/g' *.md prompts/*.md
 sed -i '' 's/^####/\n####/g' *.md prompts/*.md
 sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
 sed -i '' 's/^######/\n######/g' *.md prompts/*.md
-```
 
+```
 ### Issue: Line Length Still Too Long
 **Solution**: Break at logical points
+
 ```python
 # Break long strings
 long_string = ("This is a very long string that needs "
@@ -219,8 +238,8 @@ result = some_function(
     param2,
     param3
 )
-```
 
+```
 ## 📝 Notes for Future Cleanups
 
 1. **Start with flake8** - it catches the most critical issues
@@ -231,7 +250,6 @@ result = some_function(
 6. **Don't forget markdown linting** - MD010, MD022 are common issues
 
 ## 🚀 Quick Commands for Future Use
-
 ```bash
 # Full cleanup in one go
 source venv/bin/activate
@@ -246,8 +264,8 @@ sed -i '' 's/^####/\n####/g' *.md prompts/*.md
 sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
 sed -i '' 's/^######/\n######/g' *.md prompts/*.md
 flake8 . --exclude=venv --count  # Should show 0
-```
 
+```
 ---
 
 **This guide is based on real-world experience cleaning up the N2S TMMi Tracker codebase and should work for similar Python/Streamlit projects.**

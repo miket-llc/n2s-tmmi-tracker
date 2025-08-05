@@ -13,11 +13,10 @@ On org selection, load all historical assessments for that organization (from ea
 
 2. Assessment History Loader
 In models/database.py, implement or ensure availability of:
-
 ```python
 def get_assessments_by_org(self, org_id: int) -> List[dict]
-```
 
+```
 Each record must include:
 - Timestamp
 - Maturity level
@@ -47,12 +46,11 @@ Add context cues such as:
 
 ⚙ Backend Support
 Update or create in models/database.py:
-
 ```python
 def get_assessments_by_org(self, org_id: int) -> List[dict]
 def get_tmmi_scores_by_assessment(self, assessment_id: int) -> dict
-```
 
+```
 🖼 UI Design Notes
 - Use clean layout (st.columns(), st.expander() where needed)
 - No emojis, no gamification
