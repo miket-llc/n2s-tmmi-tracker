@@ -218,16 +218,27 @@ class TMMiDatabase:
             history = []
             for row in cursor.fetchall():
                 (timestamp, reviewer, org, yes_count, partial_count, no_count, total) = row
+                # Ensure None values don't break calculations
+                yes = yes_count or 0
+                partial = partial_count or 0
+                no = no_count or 0
+                total_questions = total or 0
+                # Partial answers count for half credit toward compliance
+                total_score = yes + 0.5 * partial
+                compliance_percentage = (
+                    total_score / total_questions * 100 if total_questions > 0 else 0
+                )
+
                 history.append(
                     {
                         "timestamp": timestamp,
                         "reviewer_name": reviewer,
                         "organization": org,
-                        "yes_count": yes_count or 0,
-                        "partial_count": partial_count or 0,
-                        "no_count": no_count or 0,
-                        "total_questions": total or 0,
-                        "compliance_percentage": (yes_count / total * 100 if total > 0 else 0),
+                        "yes_count": yes,
+                        "partial_count": partial,
+                        "no_count": no,
+                        "total_questions": total_questions,
+                        "compliance_percentage": compliance_percentage,
                     }
                 )
             return history
@@ -276,7 +287,12 @@ class TMMiDatabase:
             assessments = []
             for row in cursor.fetchall():
                 id_val, timestamp, reviewer, org, total, yes, partial, no = row
-                compliance = (yes / total * 100) if total > 0 else 0
+                yes = yes or 0
+                partial = partial or 0
+                no = no or 0
+                total = total or 0
+                total_score = yes + 0.5 * partial
+                compliance = (total_score / total * 100) if total > 0 else 0
                 assessments.append(
                     {
                         "ID": id_val,
@@ -284,9 +300,9 @@ class TMMiDatabase:
                         "Reviewer": reviewer,
                         "Organization": org,
                         "Total Questions": total,
-                        "Yes": yes or 0,
-                        "Partial": partial or 0,
-                        "No": no or 0,
+                        "Yes": yes,
+                        "Partial": partial,
+                        "No": no,
                         "Compliance %": round(compliance, 1),
                     }
                 )
@@ -489,8 +505,14 @@ class TMMiDatabase:
             for row in cursor.fetchall():
                 assessment_id, timestamp, reviewer, org, total, yes, partial, no = row
 
+                yes = yes or 0
+                partial = partial or 0
+                no = no or 0
+                total = total or 0
+
                 # Calculate compliance percentage and maturity level
-                compliance_pct = (yes / total * 100) if total > 0 else 0
+                total_score = yes + 0.5 * partial
+                compliance_pct = (total_score / total * 100) if total > 0 else 0
 
                 # Determine maturity level based on compliance (simplified logic)
                 if compliance_pct >= 90:
@@ -510,9 +532,9 @@ class TMMiDatabase:
                         "reviewer_name": reviewer,
                         "organization": org,
                         "total_answers": total,
-                        "yes_count": yes or 0,
-                        "partial_count": partial or 0,
-                        "no_count": no or 0,
+                        "yes_count": yes,
+                        "partial_count": partial,
+                        "no_count": no,
                         "compliance_percentage": compliance_pct,
                         "maturity_level": maturity_level,
                     }
