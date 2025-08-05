@@ -44,8 +44,21 @@ def get_version_info() -> Dict[str, str]:
     except Exception:
         pass  # Git info not available
     
-    # Build timestamp
-    build_date = datetime.now().strftime("%Y-%m-%d")
+    # Get git commit timestamp for build date
+    build_date = None
+    try:
+        if git_commit:
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            commit_date = subprocess.check_output(
+                ['git', 'log', '-1', '--format=%ci', git_commit], 
+                cwd=project_root,
+                stderr=subprocess.DEVNULL
+            ).decode().strip()
+            # Parse git date format and convert to readable format
+            git_datetime = datetime.strptime(commit_date[:19], '%Y-%m-%d %H:%M:%S')
+            build_date = git_datetime.strftime("%Y-%m-%d %H:%M")
+    except Exception:
+        pass  # Build date not available
     
     return {
         'version': version,
@@ -76,17 +89,18 @@ def format_version_display(compact: bool = False) -> str:
         if info['git_commit']:
             lines.append(f"Commit: {info['git_commit']}")
         
-        if info['git_branch']:
+        if info['git_branch'] and info['git_branch'] != 'main':
             lines.append(f"Branch: {info['git_branch']}")
             
-        lines.append(f"Build: {info['build_date']}")
+        if info['build_date']:
+            lines.append(f"Built: {info['build_date']}")
         
         return "\n".join(lines)
 
 
 def get_deployment_info() -> Optional[str]:
-    """Get deployment environment information"""
-    # Check if running on Streamlit Cloud
+    """Get deployment environment information - only for actual deployments"""
+    # Only show environment info for actual deployed instances
     if os.getenv('STREAMLIT_SHARING_MODE'):
         return "Streamlit Cloud"
     elif os.getenv('HEROKU_APP_NAME'):
@@ -95,5 +109,8 @@ def get_deployment_info() -> Optional[str]:
         return "Vercel"
     elif os.getenv('NETLIFY'):
         return "Netlify"
-    else:
-        return "Local Development"
+    elif os.getenv('DOCKER_CONTAINER'):
+        return "Docker"
+    # Don't show "Local Development" as it's not useful
+    return None
+

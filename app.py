@@ -206,7 +206,7 @@ def render_sidebar():
         st.markdown("### Application Info")
         st.markdown(format_version_display(compact=False), unsafe_allow_html=True)
         
-        # Deployment environment
+        # Deployment environment (only shown for actual deployments)
         deployment = get_deployment_info()
         if deployment:
             st.caption(f"Environment: {deployment}")
