@@ -28,6 +28,7 @@ flake8 . --exclude=venv --count --show-source --statistics
 - **W504**: Line break after binary operator
 - **W391**: Blank line at end of file
 - **MD010**: Hard tabs in markdown files
+- **MD022**: Headings should be surrounded by blank lines
 
 #### 🟡 **STYLE IMPROVEMENTS (Should Fix)**
 - **W0718**: Catching too general exception Exception
@@ -109,7 +110,7 @@ hovertemplate=('<b>Date:</b> %{x|%Y-%m-%d}<br>'
                + '<b>Compliance:</b> %{customdata:.1f}%<extra></extra>'),
 ```
 
-### Phase 3: Markdown Cleanup (5 minutes)
+### Phase 3: Markdown Cleanup (10 minutes)
 
 #### Fix Hard Tabs (MD010)
 ```bash
@@ -118,6 +119,16 @@ sed -i '' 's/\t/    /g' prompts/original_prompt.md
 
 # Verify no tabs remain
 grep -n $'\t' *.md prompts/*.md
+```
+
+#### Fix Heading Spacing (MD022)
+```bash
+# Add blank lines before all heading levels
+sed -i '' 's/^##/\n##/g' *.md prompts/*.md
+sed -i '' 's/^###/\n###/g' *.md prompts/*.md
+sed -i '' 's/^####/\n####/g' *.md prompts/*.md
+sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
+sed -i '' 's/^######/\n######/g' *.md prompts/*.md
 ```
 
 #### Remove Trailing Whitespace
@@ -161,13 +172,14 @@ find . -name "*.md" -not -path "./venv/*" -exec grep -l $'\t' {} \;
 - **0 flake8 errors** in Python files
 - **0 hard tabs** in markdown files
 - **0 trailing whitespace** in markdown files
+- **Proper heading spacing** in markdown files (MD022)
 - **All code remains functional** (no logic changes)
 - **Consistent code style** across all files
 
 ### 📊 **Expected Results:**
-- **Before**: 18+ flake8 errors, hard tabs in markdown
-- **After**: 0 flake8 errors, clean markdown formatting
-- **Time**: 45-60 minutes total
+- **Before**: 18+ flake8 errors, hard tabs in markdown, missing heading spacing
+- **After**: 0 flake8 errors, clean markdown formatting, proper heading spacing
+- **Time**: 50-65 minutes total
 
 ## 🔧 Common Issues and Solutions
 
@@ -181,6 +193,17 @@ black src/components/problematic_file.py
 **Solution**: Replace with spaces
 ```bash
 sed -i '' 's/\t/    /g' filename.md
+```
+
+### Issue: Missing Heading Spacing (MD022)
+**Solution**: Add blank lines before headings
+```bash
+# Add blank lines before all heading levels
+sed -i '' 's/^##/\n##/g' *.md prompts/*.md
+sed -i '' 's/^###/\n###/g' *.md prompts/*.md
+sed -i '' 's/^####/\n####/g' *.md prompts/*.md
+sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
+sed -i '' 's/^######/\n######/g' *.md prompts/*.md
 ```
 
 ### Issue: Line Length Still Too Long
@@ -202,9 +225,10 @@ result = some_function(
 
 1. **Start with flake8** - it catches the most critical issues
 2. **Use black for complex indentation** - it's more reliable than manual fixes
-3. **Check markdown files** - they often have tab/whitespace issues
+3. **Check markdown files** - they often have tab/whitespace/heading spacing issues
 4. **Verify after each phase** - don't wait until the end
 5. **Preserve functionality** - only fix style, not logic
+6. **Don't forget markdown linting** - MD010, MD022 are common issues
 
 ## 🚀 Quick Commands for Future Use
 
@@ -216,6 +240,11 @@ flake8 . --exclude=venv --count
 black src/
 sed -i '' 's/\t/    /g' *.md prompts/*.md
 sed -i '' 's/[[:space:]]*$//' *.md prompts/*.md
+sed -i '' 's/^##/\n##/g' *.md prompts/*.md
+sed -i '' 's/^###/\n###/g' *.md prompts/*.md
+sed -i '' 's/^####/\n####/g' *.md prompts/*.md
+sed -i '' 's/^#####/\n#####/g' *.md prompts/*.md
+sed -i '' 's/^######/\n######/g' *.md prompts/*.md
 flake8 . --exclude=venv --count  # Should show 0
 ```
 

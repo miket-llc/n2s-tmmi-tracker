@@ -1,7 +1,10 @@
 # N2S TMMi Tracker - Version Changelog
 
+
 ## Version 1.1.0 (2025-08-04)
 **Major Feature Release: Database Persistence & Rebranding**
+
+
 
 ### ✨ New Features
 - **Complete rebrand** from "TMMi Assessment Tracker" to "N2S TMMi Tracker"
@@ -11,16 +14,22 @@
 - **GitHub Actions CI/CD** pipeline with automated health checks
 - **Automatic database backups** before deployments
 
+
+
 ### 🏗️ Infrastructure
 - Added Dockerfile and docker-compose.yml for containerization
 - Enhanced startup script with environment variable support
 - Comprehensive deployment documentation
 - Database health monitoring and integrity checks
 
+
+
 ### 📝 Documentation
 - `deploy.md` - Production deployment guide
 - `PERSISTENCE_SUMMARY.md` - Implementation overview
 - Updated README with new branding
+
+
 
 ### 🔧 Technical Improvements
 - Environment-configurable database paths (`TMMI_DB_PATH`, `TMMI_BACKUP_DIR`)
@@ -29,6 +38,7 @@
 - Production-ready configuration
 
 ---
+
 
 ## Version 1.0.0 (Previous)
 **Initial Release**
@@ -39,6 +49,7 @@
 - Dashboard analytics
 
 ---
+
 
 ## Version Management
 
@@ -57,6 +68,8 @@ To update version for next release:
    git commit -m "chore: bump version to vX.Y.Z"
    git push origin main
    ```
+
+
 
 ### Version Numbering
 - **Major (X.0.0)**: Breaking changes, major feature overhauls

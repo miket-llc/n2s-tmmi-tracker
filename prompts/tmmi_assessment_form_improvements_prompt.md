@@ -1,5 +1,6 @@
 # TMMi Assessment Form Improvements
 
+
 ## 1. 🚫 Stop Asking for Manual Org Name Entry
 Replace:
 Any st.text_input() or freeform field for organization name
@@ -15,6 +16,7 @@ selected_org_name = st.selectbox("Select Organization", org_names)
 Store the selected org in st.session_state.selected_organization.
 
 Use this as the org_id when saving assessment data.
+
 
 ## 2. 🧭 Fix Priority Label Formatting
 Problem:
@@ -33,12 +35,14 @@ If using st.markdown() or HTML for styling, wrap everything in a flex container 
 
 Avoid floating the priority in a separate line or awkward margin
 
+
 ## 3. 🧼 General Cleanup
 Ensure the organization selector is required.
 
 Clearly indicate when a form is being prefilled based on previous assessment data (if applicable).
 
 Keep styling consistent, clean, and professional (no emojis or UI gimmicks).
+
 
 ## Output:
 Update render_assessment_form() in components/assessment.py

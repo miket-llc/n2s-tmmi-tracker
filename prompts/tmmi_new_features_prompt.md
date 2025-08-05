@@ -1,9 +1,13 @@
 # TMMi Assessment Tracker - New Features Implementation
 
+
 ## Context
 You're working on a Streamlit app called TMMi Assessment Tracker. The app is already modular and uses components like assessment.py, dashboard.py, and database.py. Your task is to implement two new features with full functionality:
 
+
 ## 🔧 Feature 1: Editable Evaluation History
+
+
 
 ### Requirements:
 - Create a new component file: `components/edit_history.py`.
@@ -20,7 +24,10 @@ def update_assessment_entry(self, entry_id: int, updated_data: dict):
 
 - Ensure proper validation and error handling.
 
+
 ## 🏢 Feature 2: Manage Organizations
+
+
 
 ### Requirements:
 - Add a new tab/page in the sidebar: "Manage Organizations".
@@ -40,12 +47,14 @@ def delete_organization(self, org_id: int)
 - Ensure that updates persist (e.g., via SQLite).
 - Validate required fields (e.g., name and email must not be empty).
 
+
 ## Additional Notes:
 - Maintain the app's existing professional style — no emojis or informal elements.
 - Use Streamlit 1.32+ features (`st.data_editor`, layout blocks, session state).
 - Keep logging (already in app.py) for all database write operations.
 - Keep all UI interactions responsive and error-tolerant.
 - Output the full code changes required, including updates to app.py, the new component files, and any necessary updates in models/database.py.
+
 
 ## Expected Deliverables:
 1. New component file: `src/components/edit_history.py`

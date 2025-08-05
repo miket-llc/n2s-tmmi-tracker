@@ -1,6 +1,9 @@
 # N2S TMMi Tracker - Production Deployment Guide
 
+
 ## Database Persistence Setup
+
+
 
 ### Environment Variables
 
@@ -16,6 +19,8 @@ export TMMI_BACKUP_DIR="/app/persistent_data/backups"
 # Questions file path
 export TMMI_QUESTIONS_PATH="/app/persistent_data/tmmi_questions.json"
 ```
+
+
 
 ### Docker Deployment
 
@@ -40,6 +45,8 @@ docker run -d \
   n2s-tmmi-tracker
 ```
 
+
+
 ### Traditional Server Deployment
 
 1. **Set up environment variables** in your deployment script or server environment:
@@ -59,7 +66,10 @@ sudo chown -R $USER:$USER /var/lib/tmmi
 ./run_app.sh
 ```
 
+
 ## GitHub Actions Integration
+
+
 
 ### Environment Setup
 
@@ -70,6 +80,8 @@ Add these secrets to your GitHub repository:
 - `PRODUCTION_SERVER_KEY`: SSH private key
 - `TMMI_DB_PATH`: Production database path
 - `TMMI_BACKUP_DIR`: Production backup directory
+
+
 
 ### Sample GitHub Actions Workflow
 
@@ -128,7 +140,10 @@ jobs:
           curl -f http://localhost:8501/_stcore/health || exit 1
 ```
 
+
 ## Data Migration and Backup
+
+
 
 ### Initial Data Setup
 
@@ -152,6 +167,8 @@ print('Stats:', db.get_database_stats())
 "
 ```
 
+
+
 ### Automated Backups
 
 Add to your crontab for regular backups:
@@ -169,7 +186,10 @@ print(f'Backup created: {backup_path}')
 " >> /var/log/tmmi_backup.log 2>&1
 ```
 
+
 ## Monitoring and Health Checks
+
+
 
 ### Application Health
 
@@ -180,6 +200,8 @@ The application includes built-in health monitoring accessible through the "Data
 - Backup status
 - Performance metrics
 
+
+
 ### Log Monitoring
 
 Monitor these log files:
@@ -187,6 +209,8 @@ Monitor these log files:
 - `logs/app.log`: Application logs
 - `deploy.log`: Deployment logs (if using GitHub Actions)
 - `/var/log/tmmi_backup.log`: Backup operation logs
+
+
 
 ### Resource Monitoring
 
@@ -197,7 +221,10 @@ Monitor these resources:
 - Application memory usage
 - Response times
 
+
 ## Troubleshooting
+
+
 
 ### Database Issues
 
@@ -230,6 +257,8 @@ sqlite3 $TMMI_DB_PATH ".backup backup.db"
 mv backup.db $TMMI_DB_PATH
 ```
 
+
+
 ### Permission Issues
 
 ```bash
@@ -239,11 +268,14 @@ chmod 755 $(dirname $TMMI_DB_PATH)
 chmod 644 $TMMI_DB_PATH
 ```
 
+
+
 ### Performance Issues
 
 1. **Database size**: Monitor using the Database Admin interface
 2. **Vacuum database**: Use the "Vacuum Database" option in admin interface
 3. **Clean old backups**: Regularly clean old backup files
+
 
 ## Security Considerations
 
@@ -251,6 +283,7 @@ chmod 644 $TMMI_DB_PATH
 2. **Backup Security**: Store backups in secure, encrypted storage
 3. **Network Security**: Use HTTPS in production
 4. **Access Control**: Implement proper authentication if needed
+
 
 ## Scaling Considerations
 
