@@ -520,7 +520,13 @@ class TMMiDatabase:
             return assessments
 
     def get_tmmi_scores_by_assessment(self, assessment_id: int) -> dict:
-        """Get detailed TMMi scores and process area breakdown for an assessment"""
+        """Retrieve assessment details with computed TMMi compliance metrics.
+
+        Loads the saved answers for the given assessment, fetches the
+        corresponding TMMi questions, and calculates compliance by maturity
+        level and process area.
+        Returns assessment metadata, answer details, and compliance scores.
+        """
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             # Get assessment details
@@ -536,6 +542,7 @@ class TMMiDatabase:
             if not assessment_row:
                 return {}
             timestamp, reviewer, organization = assessment_row
+
             # Get all answers for this assessment
             cursor.execute(
                 """
@@ -545,16 +552,46 @@ class TMMiDatabase:
             """,
                 (assessment_id,),
             )
-            answers = {}
+
+            answers: Dict[str, Dict] = {}
+            answer_list: List[AssessmentAnswer] = []
             for row in cursor.fetchall():
                 question_id, answer, evidence_url, comment = row
-                answers[question_id] = {"answer": answer, "evidence_url": evidence_url, "comment": comment}
+                answers[question_id] = {
+                    "answer": answer,
+                    "evidence_url": evidence_url,
+                    "comment": comment,
+                }
+                answer_list.append(
+                    AssessmentAnswer(
+                        question_id=question_id,
+                        answer=answer,
+                        evidence_url=evidence_url,
+                        comment=comment,
+                    )
+                )
+
+            # Load questions and compute compliance metrics
+            questions = load_tmmi_questions()
+            # Import scoring functions here to avoid circular imports
+            from src.utils.scoring import (
+                calculate_level_compliance,
+                calculate_process_area_compliance,
+            )
+
+            level_compliance = calculate_level_compliance(questions, answer_list)
+            process_area_compliance = calculate_process_area_compliance(
+                questions, answer_list
+            )
+
             return {
                 "assessment_id": assessment_id,
                 "timestamp": timestamp,
                 "reviewer_name": reviewer,
                 "organization": organization,
                 "answers": answers,
+                "level_compliance": level_compliance,
+                "process_area_compliance": process_area_compliance,
             }
 
     def backup_database(self, backup_path: str = None) -> str:
