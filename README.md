@@ -2,10 +2,9 @@
 
 A Streamlit application for evaluating and tracking progress toward TMMi (Test Maturity Model Integration) certification.
 
-
 ## Project Structure
 
-```
+```plaintext
 
 n2s-tmmi-tracker/
 ├── prompts/                    # Original requirements and prompts
@@ -22,7 +21,6 @@ n2s-tmmi-tracker/
 
 ```
 
-
 ## Features
 
 - **Assessment Engine**: Complete assessments organized by TMMi Level and Process Area
@@ -34,7 +32,6 @@ n2s-tmmi-tracker/
 - **Recommendations**: Get specific guidance for improvement
 
 - **Evidence Management**: Track supporting documentation and links
-
 
 ## Getting Started
 
@@ -51,7 +48,6 @@ n2s-tmmi-tracker/
    streamlit run app.py
 
 ```
-
 
 ## TMMi Levels
 
