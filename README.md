@@ -24,13 +24,10 @@ n2s-tmmi-tracker/
 ## Features
 
 - **Assessment Engine**: Complete assessments organized by TMMi Level and Process Area
-
+- **Assessment Review**: Comprehensive review of latest assessments with evidence and export capabilities
 - **Historical Tracking**: Store and analyze assessment results over time
-
 - **Dashboard**: Visualize maturity progress and identify gaps
-
 - **Recommendations**: Get specific guidance for improvement
-
 - **Evidence Management**: Track supporting documentation and links
 
 ## Getting Started

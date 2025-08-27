@@ -23,6 +23,7 @@ from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
 from components.progression_dashboard import render_progression_dashboard
+from components.assessment_review import render_assessment_review
 from components.debug import render_debug_info
 from components.manual_sample import render_manual_sample_data
 from components.database_admin import render_database_admin
@@ -147,6 +148,7 @@ def render_sidebar():
             'dashboard': 'Dashboard Overview',
             'assessment': 'New Assessment',
             'history': 'Assessment History',
+            'assessment_review': 'Assessment Review',
             'progress': 'Organization Progress',
             'progression_dashboard': 'Progression Dashboard',
             'edit_history': 'Edit History',
@@ -243,6 +245,8 @@ def render_main_content():
             render_assessment_page(questions)
         elif current_page == 'history':
             render_assessment_history()
+        elif current_page == 'assessment_review':
+            render_assessment_review()
         elif current_page == 'progress':
             render_organization_progress()
         elif current_page == 'progression_dashboard':

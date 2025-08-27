@@ -39,6 +39,31 @@ def generate_progressive_answers(
     answers = []
     # Calculate progression factor (0.0 to 1.0)
     progression = assessment_number / (total_assessments - 1)
+    
+    # Sample comments for different question types and levels
+    sample_comments = {
+        "L2_TPS_001": "Test policy document approved by management and published on intranet",
+        "L2_TPS_002": "Risk assessment completed and test strategy aligned with business objectives",
+        "L2_TP_001": "Standard test plan template implemented across all projects",
+        "L2_TP_002": "Entry/exit criteria defined and documented in test plan template",
+        "L2_TMC_001": "Weekly test progress reports implemented with dashboard visibility",
+        "L2_TMC_002": "Deviation tracking process established with corrective action workflows",
+        "L2_TD_001": "Test design techniques training completed for 80% of team members",
+        "L2_TE_001": "Dedicated test environment established with automated provisioning",
+        "L3_TLI_001": "Test lifecycle integrated with development process using CI/CD pipeline",
+        "L3_PR_001": "Peer review process implemented with mandatory code review requirements",
+        "L3_NFTR_001": "Performance testing framework established with baseline metrics",
+        "L3_TTO_001": "Test training program launched with quarterly skill assessments",
+        "L4_TM_001": "Test metrics dashboard implemented with real-time reporting",
+        "L4_TM_002": "Quality gates established with automated measurement collection",
+        "L4_SPC_001": "Advanced review techniques implemented including Fagan inspections",
+        "L4_QE_001": "Quality evaluation process established with defect trend analysis",
+        "L5_TPI_001": "Implementation in progress - Assessment 8",
+        "L5_QC_001": "Implementation in progress - Assessment 8",
+        "L5_TA_001": "Implementation in progress - Assessment 8",
+        "L5_TO_001": "Implementation in progress - Assessment 8"
+    }
+    
     for question in questions:
         q_level = question.level
         q_id = question.id
@@ -67,13 +92,25 @@ def generate_progressive_answers(
                 answer = "Partial"  # Some Level 5 achievement near the end
             else:
                 answer = "No"
-        # Add some realistic evidence URLs and comments
+        
+        # Add evidence URLs and comments
         evidence_url = None
         comment = None
+        
+        # Add evidence for Yes answers (after some progression)
         if answer == "Yes" and assessment_number > 3:
             evidence_url = f"https://docs.sampletest.org/{q_id.lower()}"
-        if answer == "Partial":
+        
+        # Add comments for most questions (but not all to show variety)
+        if q_id in sample_comments:
+            comment = sample_comments[q_id]
+        elif answer == "Partial":
             comment = f"Implementation in progress - Assessment {assessment_number + 1}"
+        elif answer == "No" and assessment_number > 2:
+            comment = f"Planned for implementation in Q{((assessment_number % 4) + 1)}"
+        elif answer == "Yes" and assessment_number > 4:
+            comment = f"Successfully implemented and operational since Assessment {assessment_number - 2}"
+        
         answers.append(
             AssessmentAnswer(
                 question_id=q_id,
