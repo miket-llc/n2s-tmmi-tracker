@@ -220,10 +220,10 @@ def test_generate_assessment_summary():
     assert "evidence_coverage" in summary
     assert "total_questions" in summary
     assert "answered_questions" in summary
-            assert "yes_answers" in summary
-        assert "partial_answers" in summary
-        assert "no_answers" in summary
-        assert "overall_percentage" in summary
+    assert "yes_answers" in summary
+    assert "partial_answers" in summary
+    assert "no_answers" in summary
+    assert "overall_percentage" in summary
 
 def test_determine_current_tmmi_level():
     """Test TMMi level determination logic"""
