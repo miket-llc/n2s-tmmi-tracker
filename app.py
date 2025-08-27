@@ -22,6 +22,7 @@ from components.dashboard import (
 from components.edit_history import render_edit_history
 from components.organizations import render_manage_organizations
 from components.progress import render_organization_progress
+from components.progression_dashboard import render_progression_dashboard
 from components.debug import render_debug_info
 from components.manual_sample import render_manual_sample_data
 from components.database_admin import render_database_admin
@@ -147,6 +148,7 @@ def render_sidebar():
             'assessment': 'New Assessment',
             'history': 'Assessment History',
             'progress': 'Organization Progress',
+            'progression_dashboard': 'Progression Dashboard',
             'edit_history': 'Edit History',
             'organizations': 'Manage Organizations',
             'levels': 'Level Analysis',
@@ -243,6 +245,16 @@ def render_main_content():
             render_assessment_history()
         elif current_page == 'progress':
             render_organization_progress()
+        elif current_page == 'progression_dashboard':
+            # Get the latest assessment for the progression dashboard
+            db = TMMiDatabase()
+            assessments = db.get_assessments()
+            if assessments:
+                latest_assessment = assessments[0]
+                render_progression_dashboard(questions, latest_assessment.answers)
+            else:
+                st.warning("No assessments found. Please complete an assessment first to view the progression dashboard.")
+                st.info("You can create sample data or complete a new assessment to get started.")
         elif current_page == 'edit_history':
             render_edit_history()
         elif current_page == 'organizations':

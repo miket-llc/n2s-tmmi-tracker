@@ -6,11 +6,7 @@
     "question": "Is a documented test policy established and maintained?",
     "importance": "High",
     "recommended_activity": "Define and publish a company-wide test policy. Include scope, objectives, and organizational responsibility.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.1.1 - Document Test Policy",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TPS_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TPS_002",
@@ -19,11 +15,7 @@
     "question": "Does the test strategy align with business objectives and risk assessment?",
     "importance": "High",
     "recommended_activity": "Create a risk-based test strategy document that directly links testing approach to business goals.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.2.1 - Align with Business Objectives",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TPS_002"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TP_001",
@@ -32,11 +24,7 @@
     "question": "Are test plans created for all software development projects?",
     "importance": "High",
     "recommended_activity": "Introduce a test planning template that includes objectives, scope, resources, and schedule.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.3.1 - Create Test Plans",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TP_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TP_002",
@@ -45,11 +33,7 @@
     "question": "Do test plans include clear entry and exit criteria?",
     "importance": "Medium",
     "recommended_activity": "Define standardized entry/exit criteria templates and ensure all test plans include them.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.4.1 - Define Entry/Exit Criteria",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TP_002"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TMC_001",
@@ -58,11 +42,7 @@
     "question": "Is test progress monitored against the test plan?",
     "importance": "High",
     "recommended_activity": "Implement regular test progress reporting using metrics like test case execution rate and defect discovery.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.5.1 - Monitor Progress",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TMC_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TMC_002",
@@ -71,11 +51,7 @@
     "question": "Are corrective actions taken when test activities deviate from the plan?",
     "importance": "Medium",
     "recommended_activity": "Establish a process for identifying deviations and taking corrective actions with proper documentation.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.6.1 - Take Corrective Actions",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TMC_002"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TD_001",
@@ -84,11 +60,7 @@
     "question": "Are test cases designed using systematic test design techniques?",
     "importance": "Medium",
     "recommended_activity": "Train team on test design techniques like equivalence partitioning, boundary value analysis, and decision tables.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.7.1 - Use Test Design Techniques",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TD_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L2_TE_001",
@@ -97,11 +69,7 @@
     "question": "Is a test environment established and maintained for testing activities?",
     "importance": "High",
     "recommended_activity": "Set up dedicated test environments that mirror production and establish environment management procedures.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP2.9.1 - Set Up Test Environment",
-    "generic_goal": "GG2.1, GG2.2",
-    "practice_id": "L2_TE_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L3_TLI_001",
@@ -110,11 +78,7 @@
     "question": "Is testing integrated throughout the software development lifecycle?",
     "importance": "High",
     "recommended_activity": "Implement shift-left testing practices and ensure testing activities are planned for each SDLC phase.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP3.1.1 - Integrate Throughout SDLC",
-    "generic_goal": "GG3.1, GG3.2, GG3.3",
-    "practice_id": "L3_TLI_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L3_PR_001",
@@ -123,11 +87,7 @@
     "question": "Are peer reviews systematically performed on test designs?",
     "importance": "Medium",
     "recommended_activity": "Implement mandatory peer review checklists and track completion for all test artifacts.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP3.2.1 - Conduct Peer Reviews",
-    "generic_goal": "GG3.1, GG3.2, GG3.3",
-    "practice_id": "L3_PR_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L3_NFTR_001",
@@ -136,11 +96,7 @@
     "question": "Are non-functional requirements systematically tested?",
     "importance": "High",
     "recommended_activity": "Establish performance, security, and usability testing as standard practice with defined criteria.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP3.3.1 - Test Non-functional Requirements",
-    "generic_goal": "GG3.1, GG3.2, GG3.3",
-    "practice_id": "L3_NFTR_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L3_TTO_001",
@@ -149,11 +105,7 @@
     "question": "Do testers receive appropriate training for their roles and responsibilities?",
     "importance": "Medium",
     "recommended_activity": "Create a competency framework and training program for testing roles at different levels.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP3.4.1 - Train Test Personnel",
-    "generic_goal": "GG3.1, GG3.2, GG3.3",
-    "practice_id": "L3_TTO_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L4_TM_001",
@@ -162,11 +114,7 @@
     "question": "Are test process metrics collected and analyzed over time?",
     "importance": "High",
     "recommended_activity": "Establish a KPI dashboard for test execution, defect rates, and rework costs with trend analysis.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP4.1.1 - Collect Process Metrics",
-    "generic_goal": "GG4.1, GG4.2, GG4.3, GG4.4",
-    "practice_id": "L4_TM_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L4_TM_002",
@@ -175,11 +123,7 @@
     "question": "Are quantitative quality goals established for testing activities?",
     "importance": "High",
     "recommended_activity": "Define measurable quality objectives like defect detection efficiency and test coverage targets.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP4.2.1 - Establish Quality Goals",
-    "generic_goal": "GG4.1, GG4.2, GG4.3, GG4.4",
-    "practice_id": "L4_TM_002"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L4_SPC_001",
@@ -188,11 +132,7 @@
     "question": "Are statistical process control techniques used to manage test quality?",
     "importance": "Medium",
     "recommended_activity": "Implement control charts and statistical analysis to monitor test process stability and capability.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP4.3.1 - Use SPC Techniques",
-    "generic_goal": "GG4.1, GG4.2, GG4.3, GG4.4",
-    "practice_id": "L4_SPC_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L4_QE_001",
@@ -201,11 +141,7 @@
     "question": "Is product quality evaluated using quantitative measures?",
     "importance": "High",
     "recommended_activity": "Establish quality models and metrics to quantitatively assess product quality throughout development.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP4.4.1 - Use Quantitative Measures",
-    "generic_goal": "GG4.1, GG4.2, GG4.3, GG4.4",
-    "practice_id": "L4_QE_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L5_TPI_001",
@@ -214,11 +150,7 @@
     "question": "Are test processes continuously improved based on performance data?",
     "importance": "High",
     "recommended_activity": "Implement a formal test process improvement program with regular reviews and optimization cycles.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP5.1.1 - Continuous Improvement",
-    "generic_goal": "GG5.1, GG5.2, GG5.3, GG5.4, GG5.5",
-    "practice_id": "L5_TPI_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L5_QC_001",
@@ -227,11 +159,7 @@
     "question": "Are defect prevention activities systematically implemented?",
     "importance": "High",
     "recommended_activity": "Establish root cause analysis processes and proactive defect prevention measures.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP5.2.1 - Defect Prevention Activities",
-    "generic_goal": "GG5.1, GG5.2, GG5.3, GG5.4, GG5.5",
-    "practice_id": "L5_QC_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L5_TA_001",
@@ -240,11 +168,7 @@
     "question": "Is test automation optimized and continuously improved?",
     "importance": "Medium",
     "recommended_activity": "Implement advanced automation strategies with AI/ML integration and continuous optimization.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP5.3.1 - Optimize Automation",
-    "generic_goal": "GG5.1, GG5.2, GG5.3, GG5.4, GG5.5",
-    "practice_id": "L5_TA_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   },
   {
     "id": "L5_TO_001",
@@ -253,10 +177,6 @@
     "question": "Are testing activities optimized using advanced techniques and technologies?",
     "importance": "Medium",
     "recommended_activity": "Research and implement cutting-edge testing methodologies and tools for continuous optimization.",
-    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf",
-    "specific_goal": null,
-    "specific_practice": "SP5.4.1 - Advanced Techniques",
-    "generic_goal": "GG5.1, GG5.2, GG5.3, GG5.4, GG5.5",
-    "practice_id": "L5_TO_001"
+    "reference_url": "https://www.tmmi.org/pdf/TMMi_Framework.pdf"
   }
 ]

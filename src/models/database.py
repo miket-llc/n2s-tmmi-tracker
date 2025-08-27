@@ -21,6 +21,11 @@ class TMMiQuestion:
     importance: str
     recommended_activity: str
     reference_url: str
+    # New fields for TMMi framework compliance
+    specific_goal: Optional[str] = None
+    specific_practice: Optional[str] = None
+    generic_goal: Optional[str] = None
+    practice_id: Optional[str] = None
 
 
 @dataclass
@@ -114,6 +119,48 @@ class TMMiDatabase:
             """
             )
             conn.commit()
+
+    def migrate_database(self):
+        """Migrate database schema for TMMi framework compliance"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Check if tmmi_framework_mapping table exists
+            cursor.execute("""
+                SELECT name FROM sqlite_master 
+                WHERE type='table' AND name='tmmi_framework_mapping'
+            """)
+            
+            if not cursor.fetchone():
+                # Create TMMi framework mapping table
+                cursor.execute("""
+                    CREATE TABLE tmmi_framework_mapping (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        question_id TEXT NOT NULL UNIQUE,
+                        specific_goal TEXT,
+                        specific_practice TEXT,
+                        generic_goal TEXT,
+                        practice_id TEXT,
+                        process_area_level INTEGER,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                
+                # Add indexes for performance
+                cursor.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_tmmi_question_id 
+                    ON tmmi_framework_mapping (question_id)
+                """)
+                
+                cursor.execute("""
+                    CREATE INDEX IF NOT EXISTS idx_tmmi_process_area_level 
+                    ON tmmi_framework_mapping (process_area_level)
+                """)
+                
+                conn.commit()
+                print("TMMi framework mapping table created successfully")
+            else:
+                print("TMMi framework mapping table already exists")
 
     def save_assessment(self, assessment: Assessment) -> int:
         """Save a complete assessment to the database"""
